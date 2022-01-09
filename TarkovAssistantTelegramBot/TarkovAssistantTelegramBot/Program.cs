@@ -1,5 +1,9 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 using Tarkov.Assistant.Telegram.Bot;
 using Tarkov.Assistant.Telegram.Bot.Services;
+using Tarkov.Assistant.Telegram.Bot.TelegramBotWrapper;
+using Tarkov.Assistant.Telegram.Bot.UserRegistry;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,8 +27,15 @@ services.AddHttpClient("tgwebhook")
     .AddTypedClient<ITelegramBotClient>(httpClient
         => new TelegramBotClient(botConfig.BotToken, httpClient));
 
-// Dummy business-logic service
+services.AddLocalization(options => options.ResourcesPath = "Resources");
+// 
+services.AddScoped<ITelegramBotWrapper, TelegramBotWrapper>();
+services.AddSingleton<IUserStateManager, UserStateManager>();
+services.AddSingleton<IUserRegistry, UserRegistry>();
 services.AddScoped<HandleUpdateService>();
+
+// business-logic service
+services.AddScoped<ITelegramBotController, TelegramBotController>();
 
 // The Telegram.Bot library heavily depends on Newtonsoft.Json library to deserialize
 // incoming webhook updates and send serialized responses back.
@@ -33,13 +44,26 @@ services.AddScoped<HandleUpdateService>();
 services.AddControllers()
     .AddNewtonsoftJson();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 }
+
+// Localization
+var supportedCultures = new[]
+{
+    new CultureInfo("en"),
+    new CultureInfo("ru")
+};
+            
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("ru"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
 
 app.UseRouting();
 app.UseCors();
