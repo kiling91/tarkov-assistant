@@ -1,34 +1,33 @@
-using Tarkov.Assistant.Telegram.Bot.TelegramBotWrapper;
-using Tarkov.Assistant.Telegram.Bot.UserRegistry;
-
 namespace Tarkov.Assistant.Telegram.Bot;
 
 public class TelegramBotController: ITelegramBotController
 {
-    private readonly ITelegramBotWrapper _telegramBot;
+    private readonly ITelegramBotWrapper _tg;
     private readonly ILogger<TelegramBotController> _logger;
 
     public TelegramBotController(ITelegramBotWrapper telegramBot, 
         ILogger<TelegramBotController> logger)
     {
-        _telegramBot = telegramBot;
+        _tg = telegramBot;
         _logger = logger;
     }
 
     private void HandlerMenuDefault(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Menu: {menu.Name}");
-        _telegramBot.Send(user, "ошибка", menu);
+        _tg.Send(user, $"User: {user.Id}, Menu: {menu.Name}");
     }
     
     private void HandlerMenuLanguage(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Language");
+        _tg.Send(user, $"User: {user.Id}, Language");
     }
     
     private void HandlerMenuHelp(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Help");
+        _tg.Send(user, $"User: {user.Id}, Help");
     }
     
     public MenuItem InitMainMenu()

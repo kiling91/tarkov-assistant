@@ -1,7 +1,4 @@
-using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
-
-namespace Tarkov.Assistant.Telegram.Bot.Services;
+namespace TelegramBotWrapper.Services;
 
 public class ConfigureWebhook : IHostedService
 {

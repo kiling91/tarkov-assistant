@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
-using Tarkov.Assistant.Telegram.Bot.Services;
-using Telegram.Bot.Types;
+using TelegramBotWrapper.Services;
 
-namespace Tarkov.Assistant.Telegram.Bot.Controllers;
+namespace TelegramBotWrapper.Controllers;
 
 public class WebhookController : ControllerBase
 {

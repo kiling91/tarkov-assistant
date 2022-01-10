@@ -1,4 +1,4 @@
-namespace Tarkov.Assistant.Telegram.Bot.TelegramBotWrapper;
+namespace TelegramBotWrapper.TelegramBotWrapper;
 
 public interface ITelegramBotController
 {

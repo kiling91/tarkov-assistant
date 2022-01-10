@@ -1,10 +1,6 @@
-using Microsoft.Extensions.Localization;
-using Tarkov.Assistant.Telegram.Bot.UserRegistry;
-using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBotWrapper.UserRegistry;
 
-namespace Tarkov.Assistant.Telegram.Bot.TelegramBotWrapper;
+namespace TelegramBotWrapper.TelegramBotWrapper;
 
 public class TelegramBotWrapper: ITelegramBotWrapper
 {
@@ -87,9 +83,17 @@ public class TelegramBotWrapper: ITelegramBotWrapper
         var buttons = new List<KeyboardButton>();
         foreach (var child in menu.Children)
         {
-            buttons.Add(new KeyboardButton(child.Name));
+            buttons.Add(new KeyboardButton(child.Name)
+            {
+                RequestContact = false,
+            });
         }
-        return new ReplyKeyboardMarkup(buttons.ToArray());
+        var res = new ReplyKeyboardMarkup(buttons.ToArray())
+        {
+            ResizeKeyboard = true,
+            OneTimeKeyboard = false
+        };
+        return res;
     }
 
     public async Task Send(UserProfile user, string text, MenuItem? menu = null)

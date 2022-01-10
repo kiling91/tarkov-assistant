@@ -1,14 +1,9 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Tarkov.Assistant.Telegram.Bot;
-using Tarkov.Assistant.Telegram.Bot.Services;
-using Tarkov.Assistant.Telegram.Bot.TelegramBotWrapper;
-using Tarkov.Assistant.Telegram.Bot.UserRegistry;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
-
-var botConfig = builder.Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
 
 // Add services to the container.
 var services = builder.Services;
@@ -68,6 +63,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 app.UseRouting();
 app.UseCors();
 
+var botConfig = builder.Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
 app.UseEndpoints(endpoints =>
 {
     // Configure custom endpoint per Telegram API recommendations:

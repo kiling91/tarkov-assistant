@@ -1,4 +1,4 @@
-namespace Tarkov.Assistant.Telegram.Bot;
+namespace TelegramBotWrapper;
 
 public class BotConfiguration
 {

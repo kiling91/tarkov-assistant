@@ -1,6 +1,6 @@
-using Tarkov.Assistant.Telegram.Bot.UserRegistry;
+using TelegramBotWrapper.UserRegistry;
 
-namespace Tarkov.Assistant.Telegram.Bot.TelegramBotWrapper;
+namespace TelegramBotWrapper.TelegramBotWrapper;
 
 public interface ITelegramBotWrapper
 {

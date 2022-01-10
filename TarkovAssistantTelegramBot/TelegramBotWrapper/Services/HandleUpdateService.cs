@@ -1,10 +1,7 @@
-using Tarkov.Assistant.Telegram.Bot.TelegramBotWrapper;
-using Tarkov.Assistant.Telegram.Bot.UserRegistry;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using TelegramBotWrapper.TelegramBotWrapper;
+using TelegramBotWrapper.UserRegistry;
 
-namespace Tarkov.Assistant.Telegram.Bot.Services;
+namespace TelegramBotWrapper.Services;
 
 public class HandleUpdateService
 {
