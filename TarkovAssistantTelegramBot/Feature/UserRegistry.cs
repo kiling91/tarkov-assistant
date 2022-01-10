@@ -12,4 +12,9 @@ public class UserRegistry: IUserRegistry
             Id = userId,
         };
     }
+
+    public Task<UserProfile?> FindUser(long userId)
+    {
+        throw new NotImplementedException();
+    }
 }
