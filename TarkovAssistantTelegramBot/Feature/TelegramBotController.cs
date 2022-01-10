@@ -4,14 +4,14 @@ using Telegram.Bot.Wrapper.UserRegistry;
 
 namespace Tarkov.Assistant.Telegram.Bot.Feature;
 
-public class TelegramBotController: ITelegramBotController
+public class TelegramBotController : ITelegramBotController
 {
     private readonly ITelegramBotWrapper _tg;
     private readonly IStringLocalizer<TelegramBotController> _localizer;
     private readonly ILogger<TelegramBotController> _logger;
 
-    public TelegramBotController(ITelegramBotWrapper telegramBot, 
-        ILogger<TelegramBotController> logger, 
+    public TelegramBotController(ITelegramBotWrapper telegramBot,
+        ILogger<TelegramBotController> logger,
         IStringLocalizer<TelegramBotController> localizer)
     {
         _tg = telegramBot;
@@ -24,38 +24,37 @@ public class TelegramBotController: ITelegramBotController
         _logger.LogInformation($"User: {user.Id}, Menu: {menu.Name}");
         _tg.Send(user, $"User: {user.Id}, Menu: {menu.Name}", menu);
     }
-    
+
     private void HandlerMenuLanguage(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Language");
         _tg.Send(user, $"User: {user.Id}, Language");
     }
-    
+
     private void HandlerMenuHelp(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Help");
         _tg.Send(user, $"User: {user.Id}, Help");
     }
     
+    private void HandlerMenuPersonalAccount(MenuItem menu, UserProfile user)
+    {
+        _logger.LogInformation($"User: {user.Id}, Personal account");
+        _tg.Send(user, $"User: {user.Id}, Personal account");
+    }
+
     public MenuItem InitMainMenu()
     {
         var mainMenu = new MenuItem("MainMenu", null)
         {
-            UploadHandlerCallback = HandlerMenuDefault,
+            HandlerCallback = HandlerMenuDefault,
         };
+        
+        mainMenu.AddItem(_localizer["Share contact"], HandlerMenuDefault, MenuItemType.IsRequestPhoneButton);
+        mainMenu.AddItem(_localizer["Personal account"], HandlerMenuPersonalAccount, MenuItemType.Text, true);
 
-        var languageMenu = new MenuItem(_localizer["Language"], mainMenu)
-        {
-            UploadHandlerCallback = HandlerMenuLanguage
-        };
-        
-        var helpMenu = new MenuItem(_localizer["Help"], mainMenu)
-        {
-            UploadHandlerCallback = HandlerMenuHelp
-        };
-        
-        mainMenu.Children.Add(languageMenu);
-        mainMenu.Children.Add(helpMenu);
+        mainMenu.AddItem(_localizer["Language"], HandlerMenuLanguage);
+        mainMenu.AddItem(_localizer["Help"], HandlerMenuHelp, MenuItemType.Text, true);
         
         return mainMenu;
     }

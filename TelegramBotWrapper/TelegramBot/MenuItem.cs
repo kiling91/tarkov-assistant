@@ -2,6 +2,13 @@ using Telegram.Bot.Wrapper.UserRegistry;
 
 namespace Telegram.Bot.Wrapper.TelegramBot;
 
+public enum MenuItemType
+{
+    Text,
+    IsRequestPhoneButton,
+    Back
+}
+
 public class MenuItem
 {
     public MenuItem(string name, MenuItem? parent)
@@ -12,7 +19,24 @@ public class MenuItem
     public string Name { get; private set; }
     public List<MenuItem> Children { get; private set; } = new();
     public MenuItem? Parent { get; private set; } = null;
-    public Action<MenuItem, UserProfile>? UploadHandlerCallback { get; init; } = null;
+    public Action<MenuItem, UserProfile>? HandlerCallback { get; init; } = null;
+
+    public bool LastInRow { get; init; } = false;
+
+    public MenuItemType Type { get; init; } = MenuItemType.Text;
+    
+    public MenuItem AddItem(string menuName, Action<MenuItem, UserProfile> handler, 
+        MenuItemType type = MenuItemType.Text, bool lastInRow = false )
+    {
+        var child = new MenuItem(menuName, this)
+        {
+            HandlerCallback = handler,
+            LastInRow = lastInRow,
+            Type = type,
+        };
+        Children.Add(child);
+        return child;
+    }
     
     public MenuItem? FindMenu(string menuName)
     {

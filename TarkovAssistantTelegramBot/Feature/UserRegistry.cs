@@ -10,11 +10,15 @@ public class UserRegistry: IUserRegistry
         return new UserProfile()
         {
             Id = userId,
+            Lang = lang,
+            FirstName = firstName,
+            LastName = lastName,
         };
     }
 
-    public Task<UserProfile?> FindUser(long userId)
+    public async Task<UserProfile?> FindUser(long userId)
     {
-        throw new NotImplementedException();
+        await Task.CompletedTask;
+        return null;
     }
 }

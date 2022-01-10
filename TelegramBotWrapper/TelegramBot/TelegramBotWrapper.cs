@@ -23,11 +23,7 @@ public class TelegramBotWrapper: ITelegramBotWrapper
     
     public void SetupMainMenu(MenuItem mainMenu)
     {
-        _mainMenu = new MenuItem(mainMenu.Name, null)
-        {
-            UploadHandlerCallback = mainMenu.UploadHandlerCallback
-        };
-        _mainMenu.Children.AddRange(mainMenu.Children);
+        _mainMenu = mainMenu;
     }
 
     public async Task<bool> DrawMenu(string? text, UserProfile user)
@@ -63,9 +59,9 @@ public class TelegramBotWrapper: ITelegramBotWrapper
             return false;
         }
 
-        if (currentMenu.UploadHandlerCallback != null)
+        if (currentMenu.HandlerCallback != null)
         {
-            currentMenu.UploadHandlerCallback(currentMenu, user);
+            currentMenu.HandlerCallback(currentMenu, user);
         }
         
         return true;
@@ -74,22 +70,35 @@ public class TelegramBotWrapper: ITelegramBotWrapper
     public Task DrawMainMenu(UserProfile user)
     {
         _userState.SetActualMenuName(user.Id, "");
-        if (_mainMenu.UploadHandlerCallback != null)
+        if (_mainMenu.HandlerCallback != null)
         {
-            _mainMenu.UploadHandlerCallback(_mainMenu, user);
+            _mainMenu.HandlerCallback(_mainMenu, user);
         }
         return Task.CompletedTask;
     }
 
     private ReplyKeyboardMarkup RenderMenuItem(MenuItem menu)
     {
-        var buttons = new List<KeyboardButton>();
+        var buttons = new List<List<KeyboardButton>>();
+        var row = new List<KeyboardButton>();
+        buttons.Add(row);
+        
         foreach (var child in menu.Children)
         {
-            buttons.Add(new KeyboardButton(child.Name)
+            if (child.Type == MenuItemType.IsRequestPhoneButton)
             {
-                RequestContact = false,
-            });
+                row.Add(KeyboardButton.WithRequestContact(child.Name));
+            }
+            else
+            {
+                row.Add(new KeyboardButton(child.Name));
+            }
+
+            if (child.LastInRow)
+            {
+                row = new List<KeyboardButton>();
+                buttons.Add(row);
+            }
         }
         var res = new ReplyKeyboardMarkup(buttons.ToArray())
         {
