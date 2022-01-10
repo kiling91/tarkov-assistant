@@ -1,6 +1,9 @@
-using TelegramBotWrapper.UserRegistry;
+using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.Bot.Wrapper.UserRegistry;
 
-namespace TelegramBotWrapper.TelegramBotWrapper;
+namespace Telegram.Bot.Wrapper.TelegramBot;
 
 public class TelegramBotWrapper: ITelegramBotWrapper
 {
@@ -69,13 +72,11 @@ public class TelegramBotWrapper: ITelegramBotWrapper
         return true;
     }
     
-    public async Task DrawMainMenu(UserProfile user)
+    public Task DrawMainMenu(UserProfile user)
     {
         _userState.SetActualMenuName(user.Id, "");
-        if (_mainMenu.UploadHandlerCallback != null)
-        {
-            _mainMenu.UploadHandlerCallback(_mainMenu, user);
-        }
+        _mainMenu.UploadHandlerCallback?.Invoke(_mainMenu, user);
+        return Task.CompletedTask;
     }
 
     private ReplyKeyboardMarkup RenderMenuItem(MenuItem menu)

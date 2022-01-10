@@ -1,7 +1,11 @@
-using TelegramBotWrapper.TelegramBotWrapper;
-using TelegramBotWrapper.UserRegistry;
+using Microsoft.Extensions.Logging;
+using Telegram.Bot.Exceptions;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Wrapper.TelegramBot;
+using Telegram.Bot.Wrapper.UserRegistry;
 
-namespace TelegramBotWrapper.Services;
+namespace Telegram.Bot.Wrapper.Services;
 
 public class HandleUpdateService
 {

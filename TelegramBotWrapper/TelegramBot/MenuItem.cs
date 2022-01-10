@@ -1,6 +1,6 @@
-using TelegramBotWrapper.UserRegistry;
+using Telegram.Bot.Wrapper.UserRegistry;
 
-namespace TelegramBotWrapper.TelegramBotWrapper;
+namespace Telegram.Bot.Wrapper.TelegramBot;
 
 public class MenuItem
 {

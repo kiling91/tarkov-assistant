@@ -1,4 +1,6 @@
-namespace TelegramBotWrapper.UserRegistry;
+using Telegram.Bot.Wrapper.UserRegistry;
+
+namespace Tarkov.Assistant.Telegram.Bot;
 
 public class UserRegistry: IUserRegistry
 {

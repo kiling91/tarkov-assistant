@@ -1,4 +1,4 @@
-namespace TelegramBotWrapper.UserRegistry;
+namespace Telegram.Bot.Wrapper.UserRegistry;
 
 public class UserProfile
 {

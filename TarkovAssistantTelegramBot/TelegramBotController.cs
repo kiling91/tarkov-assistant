@@ -1,3 +1,6 @@
+using Telegram.Bot.Wrapper.TelegramBot;
+using Telegram.Bot.Wrapper.UserRegistry;
+
 namespace Tarkov.Assistant.Telegram.Bot;
 
 public class TelegramBotController: ITelegramBotController

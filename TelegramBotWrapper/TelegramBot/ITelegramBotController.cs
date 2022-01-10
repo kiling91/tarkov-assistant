@@ -1,4 +1,4 @@
-namespace TelegramBotWrapper.TelegramBotWrapper;
+namespace Telegram.Bot.Wrapper.TelegramBot;
 
 public interface ITelegramBotController
 {

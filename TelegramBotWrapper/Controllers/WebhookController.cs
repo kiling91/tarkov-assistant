@@ -1,6 +1,8 @@
-using TelegramBotWrapper.Services;
+using Microsoft.AspNetCore.Mvc;
+using Telegram.Bot.Types;
+using Telegram.Bot.Wrapper.Services;
 
-namespace TelegramBotWrapper.Controllers;
+namespace Telegram.Bot.Wrapper.Controllers;
 
 public class WebhookController : ControllerBase
 {
