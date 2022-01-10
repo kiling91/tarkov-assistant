@@ -40,7 +40,7 @@ public class TelegramBotController : ITelegramBotController
     private void HandlerMenuPersonalAccount(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Personal account");
-        _tg.Send(user, $"User: {user.Id}, Personal account");
+        _tg.Send(user, $"User: {user.Id}, Personal account", menu);
     }
 
     public MenuItem InitMainMenu()
@@ -50,9 +50,14 @@ public class TelegramBotController : ITelegramBotController
             HandlerCallback = HandlerMenuDefault,
         };
         
-        mainMenu.AddItem(_localizer["Share contact"], HandlerMenuDefault, MenuItemType.IsRequestPhoneButton);
-        mainMenu.AddItem(_localizer["Personal account"], HandlerMenuPersonalAccount, MenuItemType.Text, true);
+        mainMenu.AddItem(_localizer["Share contact"], HandlerMenuHelp, MenuItemType.IsRequestPhoneButton);
+        var personalAccount = mainMenu.AddItem(_localizer["Personal account"], 
+            HandlerMenuPersonalAccount, MenuItemType.Text, true);
 
+        personalAccount.AddItem(_localizer["Balance"], HandlerMenuHelp);
+        personalAccount.AddItem(_localizer["Documents"], HandlerMenuHelp);
+        personalAccount.AddItem(_localizer["Back"], null, MenuItemType.Back);
+        
         mainMenu.AddItem(_localizer["Language"], HandlerMenuLanguage);
         mainMenu.AddItem(_localizer["Help"], HandlerMenuHelp, MenuItemType.Text, true);
         

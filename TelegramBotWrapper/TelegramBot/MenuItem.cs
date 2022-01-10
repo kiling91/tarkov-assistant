@@ -25,7 +25,7 @@ public class MenuItem
 
     public MenuItemType Type { get; init; } = MenuItemType.Text;
     
-    public MenuItem AddItem(string menuName, Action<MenuItem, UserProfile> handler, 
+    public MenuItem AddItem(string menuName, Action<MenuItem, UserProfile>? handler, 
         MenuItemType type = MenuItemType.Text, bool lastInRow = false )
     {
         var child = new MenuItem(menuName, this)

@@ -38,7 +38,7 @@ public class TelegramBotWrapper: ITelegramBotWrapper
         // Получаем актуальное меню, в котором сейчас находимся
         var actualMenuName = _userState.GetActualMenuName(user.Id);
         MenuItem? currentMenu = null;
-        currentMenu = actualMenuName == "" ? _mainMenu : _mainMenu.FindMenu(text);
+        currentMenu = actualMenuName == "" ? _mainMenu : _mainMenu.FindMenu(actualMenuName);
         
         if (currentMenu == null) 
         {
@@ -58,6 +58,8 @@ public class TelegramBotWrapper: ITelegramBotWrapper
             _logger.LogError($"Failed to find menu with name {actualMenuName}");
             return false;
         }
+
+        _userState.SetActualMenuName(user.Id, currentMenu.Name);
 
         if (currentMenu.HandlerCallback != null)
         {
@@ -105,6 +107,7 @@ public class TelegramBotWrapper: ITelegramBotWrapper
             ResizeKeyboard = true,
             OneTimeKeyboard = false
         };
+        
         return res;
     }
 
