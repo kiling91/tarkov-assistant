@@ -27,6 +27,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    var d = 0;
 }
 
 app.UseMiddleware<UserLanguageMiddleware>();
