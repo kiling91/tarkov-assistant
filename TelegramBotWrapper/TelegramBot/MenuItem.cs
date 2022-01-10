@@ -37,14 +37,17 @@ public class MenuItem
         Children.Add(child);
         return child;
     }
+
+    public MenuItem? ShowMenuItem()
+    {
+        // if currentItem is a leaf we should show the parent's menu
+        return Children.Count > 0 ? this : this.Parent;
+    }
     
     public MenuItem? FindMenu(string menuName)
     {
-        foreach (var child in this.Children)
-        {
-            if (child.Name == menuName)
-                return child;
-        }
+        if (Name == menuName)
+            return this;
         
         foreach (var child in this.Children)
         {
@@ -57,6 +60,7 @@ public class MenuItem
 
     public MenuItem? FindSubMenu(string menuName)
     {
-        return Children.FirstOrDefault(x => x.Name == menuName);
+        var showMenuItem = ShowMenuItem();
+        return showMenuItem?.Children.FirstOrDefault(x => x.Name == menuName);
     }
 }

@@ -16,6 +16,7 @@ public static class TelegramBotExtensions
         // Some of them could be found in this article https://andrewlock.net/running-async-tasks-on-app-startup-in-asp-net-core-part-1/
         // We are going to use IHostedService to add and later remove Webhook
         services.AddHostedService<ConfigureWebhook>();
+        services.AddSingleton<ICallbackStorage, CallbackStorage>();
         services.AddScoped<ITelegramBotWrapper, TelegramBotWrapper>();
         services.AddScoped<HandleUpdateService>();
         // Register named HttpClient to get benefits of IHttpClientFactory

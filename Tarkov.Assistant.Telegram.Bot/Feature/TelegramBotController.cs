@@ -22,25 +22,45 @@ public class TelegramBotController : ITelegramBotController
     private void HandlerMenuDefault(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Menu: {menu.Name}");
-        _tg.Send(user, $"User: {user.Id}, Menu: {menu.Name}", menu);
+        _tg.SendMenu(user, $"User: {user.Id}, Menu: {menu.Name}", menu);
     }
 
     private void HandlerMenuLanguage(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Language");
-        _tg.Send(user, $"User: {user.Id}, Language");
+
+        var inlineMenu = new InlineMenu();
+        inlineMenu.Items.Add(new InlineMenuItem()
+        {
+            ItemName = "Русский",
+            Callback = ((item, profile) =>
+            {
+                _tg.SendText(user, $"Select Language RU: {item.ItemName}");
+            })
+        });
+        
+        inlineMenu.Items.Add(new InlineMenuItem()
+        {
+            ItemName = "English",
+            Callback = ((item, profile) =>
+            {
+                _tg.SendText(user, $"Select Language EN: {item.ItemName}");
+            })
+        });
+        
+        _tg.SendInlineMenu(user, $"Select language", inlineMenu);
     }
 
     private void HandlerMenuHelp(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Help");
-        _tg.Send(user, $"User: {user.Id}, Help");
+        _tg.SendText(user, $"User: {user.Id}, Help");
     }
     
     private void HandlerMenuPersonalAccount(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Personal account");
-        _tg.Send(user, $"User: {user.Id}, Personal account", menu);
+        _tg.SendMenu(user, $"User: {user.Id}, Personal account", menu);
     }
 
     public MenuItem InitMainMenu()
