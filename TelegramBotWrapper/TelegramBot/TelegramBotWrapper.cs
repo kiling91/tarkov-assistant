@@ -11,7 +11,6 @@ public class TelegramBotWrapper: ITelegramBotWrapper
     private readonly ILogger<TelegramBotWrapper> _logger;
     private readonly IUserStateManager _userState;
     private readonly ITelegramBotClient _botClient;
-    // private readonly IStringLocalizer<TelegramBotWrapper> _localizer;
     
     public TelegramBotWrapper(ITelegramBotClient botClient,
         IUserStateManager userState, 
@@ -75,7 +74,10 @@ public class TelegramBotWrapper: ITelegramBotWrapper
     public Task DrawMainMenu(UserProfile user)
     {
         _userState.SetActualMenuName(user.Id, "");
-        _mainMenu.UploadHandlerCallback?.Invoke(_mainMenu, user);
+        if (_mainMenu.UploadHandlerCallback != null)
+        {
+            _mainMenu.UploadHandlerCallback(_mainMenu, user);
+        }
         return Task.CompletedTask;
     }
 

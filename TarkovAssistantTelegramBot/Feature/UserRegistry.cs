@@ -1,6 +1,6 @@
 using Telegram.Bot.Wrapper.UserRegistry;
 
-namespace Tarkov.Assistant.Telegram.Bot;
+namespace Tarkov.Assistant.Telegram.Bot.Feature;
 
 public class UserRegistry: IUserRegistry
 {

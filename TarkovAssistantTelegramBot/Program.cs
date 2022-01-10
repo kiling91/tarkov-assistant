@@ -1,9 +1,9 @@
+using Serilog;
 using CommonLib;
-using Tarkov.Assistant.Telegram.Bot;
+using Tarkov.Assistant.Telegram.Bot.Feature;
 using Telegram.Bot.Wrapper;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((_, lc) => lc.InitLogger());
@@ -26,6 +26,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
 }
+
 app.InittLocalization();
 app.UseRouting();
 app.UseCors();
