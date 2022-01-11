@@ -18,7 +18,7 @@ public static class TelegramBotExtensions
         services.AddHostedService<ConfigureWebhook>();
         services.AddSingleton<ICallbackStorage, CallbackStorage>();
         services.AddScoped<ITelegramBotWrapper, TelegramBotWrapper>();
-        services.AddScoped<HandleUpdateService>();
+        services.AddScoped<IHandleUpdateService, HandleUpdateService>();
         // Register named HttpClient to get benefits of IHttpClientFactory
         // and consume it with ITelegramBotClient typed client.
         // More read:

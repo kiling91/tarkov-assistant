@@ -13,14 +13,16 @@ public class TelegramBotWrapper : ITelegramBotWrapper
     private readonly ITelegramBotClient _botClient;
     private readonly ICallbackStorage _callbackStorage;
 
-    public TelegramBotWrapper(ITelegramBotClient botClient,
+    public TelegramBotWrapper(
+        ITelegramBotClient botClient,
         IUserStateManager userState,
-        ILogger<TelegramBotWrapper> logger, ICallbackStorage callbackStorage)
+        ICallbackStorage callbackStorage,
+        ILogger<TelegramBotWrapper> logger)
     {
         _botClient = botClient;
         _userState = userState;
-        _logger = logger;
         _callbackStorage = callbackStorage;
+        _logger = logger;
     }
 
     public void SetupMainMenu(MenuItem mainMenu)

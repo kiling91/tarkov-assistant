@@ -34,4 +34,20 @@ public class UserRegistry: IUserRegistry
 
         return null;
     }
+
+    public async Task ChangeLang(long userId, string? lang)
+    {
+        await Task.CompletedTask;
+        var user = await FindUser(userId);
+        if (user == null)
+            // Заменить на свой класс Exeption
+            throw new NullReferenceException($"User with id {userId} not found");
+        _profiles[userId] = new UserProfile
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Lang = lang
+        };
+    }
 }

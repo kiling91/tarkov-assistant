@@ -4,12 +4,11 @@ namespace Telegram.Bot.Wrapper.TelegramBot;
 
 public class InlineMenuItem
 {
-	public string? Unique { get; init; }
-	public string? ItemId { get; init; }
 	public string ItemName { get; init; } = "";
-	public string? ItemImage { get; init; }
 	public string? Url { get; init; }
-	public Action<InlineMenuItem, UserProfile>? Callback { get; init; } = null;
+	public object? Data { get; set; }
+	public string? Key { get; set; }
+	public Func<InlineMenuItem, UserProfile, Task>? Callback { get; init; } = null;
 }
 
 public class InlineMenu

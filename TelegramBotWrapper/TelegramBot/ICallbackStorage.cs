@@ -4,6 +4,8 @@ namespace Telegram.Bot.Wrapper.TelegramBot;
 
 public interface ICallbackStorage
 {
-    void AddCallBack(string uid, InlineMenuItem menuItem, Action<InlineMenuItem, UserProfile> callback);
+    void AddCallBack(string uid, InlineMenuItem menuItem,
+        Func<InlineMenuItem, UserProfile, Task> callback);
+
     Task<bool> Invoke(string uid, long userId);
 }

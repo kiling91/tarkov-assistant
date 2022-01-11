@@ -18,7 +18,7 @@ public static class LocalizationExtensions
         {
             DefaultRequestCulture = new RequestCulture("en"),
             SupportedCultures = supportedCultures,
-            SupportedUICultures = supportedCultures
+            SupportedUICultures = supportedCultures,
         });
     }
 }

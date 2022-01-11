@@ -11,8 +11,7 @@ namespace CommonLib
         {
             app.MinimumLevel.Information()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerHandler",
-                    LogEventLevel.Fatal)
+                .MinimumLevel.Override("System.Net.Http.HttpClient.tgwebhook", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Hosting", LogEventLevel.Information)
                 .MinimumLevel.Override("Serilog", LogEventLevel.Warning)
                 .Enrich.WithExceptionDetails()

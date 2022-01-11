@@ -6,11 +6,16 @@ namespace Telegram.Bot.Wrapper.Controllers;
 
 public class WebhookController : ControllerBase
 {
+    private readonly IHandleUpdateService _handle;
+    public WebhookController(IHandleUpdateService handle)
+    {
+        _handle = handle;
+    }
+    
     [HttpPost]
-    public async Task<IActionResult> Post([FromServices] HandleUpdateService handleUpdateService,
-                                          [FromBody] Update update)
-    {   
-        await handleUpdateService.HandleAsync(update);
+    public async Task<IActionResult> Post([FromBody] Update update)
+    {
+        await _handle.HandleAsync(update);
         return Ok();
     }
 }

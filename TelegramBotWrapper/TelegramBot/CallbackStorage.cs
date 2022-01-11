@@ -5,9 +5,9 @@ namespace Telegram.Bot.Wrapper.TelegramBot;
 struct CallBackData
 {
     public InlineMenuItem Menu { get; private set; }
-    public Action<InlineMenuItem, UserProfile> Callback { get; private set; }
+    public Func<InlineMenuItem, UserProfile, Task> Callback { get; private set; }
 
-    public CallBackData(InlineMenuItem menu, Action<InlineMenuItem, UserProfile> callback)
+    public CallBackData(InlineMenuItem menu, Func<InlineMenuItem, UserProfile, Task> callback)
     {
         this.Menu = menu;
         this.Callback = callback;
@@ -25,7 +25,7 @@ public class CallbackStorage : ICallbackStorage
     }
 
     public void AddCallBack(string uid, InlineMenuItem menuItem,
-        Action<InlineMenuItem, UserProfile> callback)
+        Func<InlineMenuItem, UserProfile, Task> callback)
     {
         _storage.Add(uid, new CallBackData(menuItem, callback));
     }
@@ -41,7 +41,7 @@ public class CallbackStorage : ICallbackStorage
         if (user == null)
             return false;
         
-        item.Callback(item.Menu, user);
+        await item.Callback(item.Menu, user);
         return true;
     }
 }

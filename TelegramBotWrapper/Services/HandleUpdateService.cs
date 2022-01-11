@@ -7,7 +7,7 @@ using Telegram.Bot.Wrapper.UserRegistry;
 
 namespace Telegram.Bot.Wrapper.Services;
 
-public class HandleUpdateService
+public class HandleUpdateService : IHandleUpdateService
 {
     private readonly ITelegramBotWrapper _botWrapper;
     private readonly IUserRegistry _userRegistry;
@@ -25,7 +25,6 @@ public class HandleUpdateService
         
         _userRegistry = userRegistry;
         _callbackStorage = callbackStorage;
-
         _logger = logger;
     }
 
@@ -70,7 +69,6 @@ public class HandleUpdateService
 
     private async Task BotOnMessageReceived(Message message)
     {
-        _logger.LogInformation("Receive message type: {messageType}", message.Type);
         if (message.Type != MessageType.Text)
             return;
 
@@ -94,6 +92,9 @@ public class HandleUpdateService
 
     private Task HandleErrorAsync(Exception exception)
     {
+        if (exception is NeedReloadLanguageException dfd)
+            throw new NeedReloadLanguageException(dfd.Lang);
+        
         var errorMessage = exception switch
         {
             ApiRequestException apiRequestException =>
