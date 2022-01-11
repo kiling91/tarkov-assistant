@@ -10,7 +10,9 @@ builder.Host.UseSerilog((_, lc) => lc.InitLogger());
 
 // Add services to the container.
 var services = builder.Services;
-var botConfig = builder.Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
+var botConfig = builder.Configuration.GetSection(BotConfiguration.ConfigName).Get<BotConfiguration>();
+services.Configure<BotConfiguration>(builder.Configuration.GetSection(BotConfiguration.ConfigName));
+services.Configure<AvailableLanguagesConfiguration>(builder.Configuration.GetSection(AvailableLanguagesConfiguration.ConfigName));
 
 services.InitTelegramBot(builder.Configuration);
 // Локализация хранится в ресурсах
@@ -22,6 +24,9 @@ services.AddSingleton<IUserRegistry, UserRegistry>();
 // business-logic service
 services.AddScoped<ITelegramBotController, TelegramBotController>();
 
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,7 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<UserLanguageMiddleware>();
-app.InitLocalization();
+app.InitLocalization(builder.Configuration);
 app.UseRouting();
 app.UseCors();
 app.InitTelegramBotEndPoint(builder.Configuration);

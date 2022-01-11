@@ -15,4 +15,8 @@
       <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TelegramBotWrapper\TelegramBotWrapper.csproj" />
+    </ItemGroup>
+
 </Project>

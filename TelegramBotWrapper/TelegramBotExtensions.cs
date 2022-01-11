@@ -10,7 +10,7 @@ public static class TelegramBotExtensions
 {
     public static void InitTelegramBot(this IServiceCollection services, IConfiguration configuration)
     {
-        var botConfig = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
+        var botConfig = configuration.GetSection(BotConfiguration.ConfigName).Get<BotConfiguration>();
 
         // There are several strategies for completing asynchronous tasks during startup.
         // Some of them could be found in this article https://andrewlock.net/running-async-tasks-on-app-startup-in-asp-net-core-part-1/
@@ -38,7 +38,7 @@ public static class TelegramBotExtensions
 
     public static void InitTelegramBotEndPoint(this IApplicationBuilder app, IConfiguration configuration)
     {
-        var botConfig = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
+        var botConfig = configuration.GetSection(BotConfiguration.ConfigName).Get<BotConfiguration>();
 
         app.UseEndpoints(endpoints =>
         {

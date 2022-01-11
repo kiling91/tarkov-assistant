@@ -1,6 +1,8 @@
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RestSharp;
 using Telegram.Bot.Types;
@@ -22,11 +24,9 @@ namespace Telegram.Bot.Wrapper
     {
         private readonly RequestDelegate _next;
         private readonly IUserRegistry _userRegistry;
-        private readonly ILogger<UserLanguageMiddleware> _logger;
-
+        private ILogger<UserLanguageMiddleware> _logger;
         public UserLanguageMiddleware(RequestDelegate next,
-            IUserRegistry userRegistry,
-            ILogger<UserLanguageMiddleware> logger)
+            IUserRegistry userRegistry, ILogger<UserLanguageMiddleware> logger)
         {
             _next = next;
             _userRegistry = userRegistry;
@@ -55,9 +55,28 @@ namespace Telegram.Bot.Wrapper
                 context.Request.Headers.Add("Accept-Language", lang);
         }
 
-        public async Task Invoke(HttpContext context)
+        private async Task ReplayCommand(string data, HttpContext context, BotConfiguration configuration)
         {
-            var data = await ReadBuffer(context);
+            var headers = new List<KeyValuePair<string, string>>();
+            foreach (var header in context.Request.Headers)
+                headers.Add(new KeyValuePair<string, string>(header.Key, header.Value));
+            var client = new RestClient(configuration.HostAddress);
+
+            var request = new RestRequest(context.Request.Path)
+                .AddHeaders(headers)
+                .AddStringBody(data, DataFormat.Json);
+            try
+            {
+                await client.PostAsync(request);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e.Message);
+            }
+        }
+
+        private async Task SetHeaderLanguage(string data, HttpContext context)
+        {
             var update = JsonConvert.DeserializeObject<Update>(data);
             if (update != null)
             {
@@ -67,39 +86,27 @@ namespace Telegram.Bot.Wrapper
 
                 var user = await _userRegistry.FindUser(userId);
                 if (user != null && user.Lang != null)
-                {
                     ChangeHeaderLang(context, user.Lang);
-                    _logger.LogWarning($"Set language {user.Lang}");
-                }
                 else
                 {
                     var lang = update.Message?.From?.LanguageCode;
                     if (lang != null)
-                    {
                         ChangeHeaderLang(context, lang);
-                        _logger.LogWarning($"Set language {lang}");
-                    }
                 }
             }
+        }
 
+        public async Task Invoke(HttpContext context, IOptions<BotConfiguration> configuration)
+        {
+            var data = await ReadBuffer(context);
+            await SetHeaderLanguage(data, context);
             try
             {
                 await _next.Invoke(context);
             }
-            catch (NeedReloadLanguageException e)
+            catch (NeedReloadLanguageException)
             {
-                if (update != null)
-                {
-                    var headers = new List<KeyValuePair<string, string>>();
-                    foreach (var header in context.Request.Headers)
-                        headers.Add(new KeyValuePair<string, string>(header.Key, header.Value));
-                    var client = new RestClient($"https://{context.Request.Host.Value}");
-
-                    var request = new RestRequest(context.Request.Path)
-                        .AddHeaders(headers)
-                        .AddStringBody(data, DataFormat.Json);
-                    await client.PostAsync(request);
-                }
+                await ReplayCommand(data, context, configuration.Value);
             }
         }
     }

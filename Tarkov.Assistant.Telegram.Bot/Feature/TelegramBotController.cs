@@ -1,4 +1,6 @@
+using System.Globalization;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Telegram.Bot.Wrapper;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
@@ -11,16 +13,17 @@ public class TelegramBotController : ITelegramBotController
     private readonly IStringLocalizer<TelegramBotController> _localizer;
     private readonly ILogger<TelegramBotController> _logger;
     private readonly IUserRegistry _userRegistry;
-    private readonly IUserStateManager _userStateManager;
+    private IOptions<AvailableLanguagesConfiguration> _availableLanguagesConfiguration;
+        
     public TelegramBotController(ITelegramBotWrapper telegramBot,
         IUserRegistry userRegistry,
-        IUserStateManager userStateManager,
         ILogger<TelegramBotController> logger,
+        IOptions<AvailableLanguagesConfiguration> availableLanguagesConfiguration,
         IStringLocalizer<TelegramBotController> localizer)
     {
         _tg = telegramBot;
         _userRegistry = userRegistry;
-        _userStateManager = userStateManager;
+        _availableLanguagesConfiguration = availableLanguagesConfiguration;
         _logger = logger;
         _localizer = localizer;
     }
@@ -49,21 +52,19 @@ public class TelegramBotController : ITelegramBotController
     private void HandlerMenuLanguage(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Language");
-
         var inlineMenu = new InlineMenu();
-        inlineMenu.Items.Add(new InlineMenuItem()
+        foreach (var lng in _availableLanguagesConfiguration.Value.Languages!)
         {
-            ItemName = "Русский",
-            Key = "ru",
-            Callback = HandleChangeLanguage
-        });
-        
-        inlineMenu.Items.Add(new InlineMenuItem()
-        {
-            ItemName = "English",
-            Key = "en",
-            Callback = HandleChangeLanguage
-        });
+            if (CultureInfo.CurrentCulture.Name == lng.LanguageCode)
+                continue;
+            
+            inlineMenu.Items.Add(new InlineMenuItem()
+            {
+                ItemName = lng.LanguageName,
+                Key = lng.LanguageCode,
+                Callback = HandleChangeLanguage
+            });
+        }
         
         _tg.SendInlineMenu(user, $"Select language", inlineMenu);
     }
