@@ -1,6 +1,8 @@
 using System.Globalization;
+using MediatR;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Tarkov.Assistant.Telegram.Bot.Command;
 using Telegram.Bot.Wrapper;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
@@ -12,20 +14,18 @@ public class TelegramBotController : ITelegramBotController
     private readonly ITelegramBotWrapper _tg;
     private readonly IStringLocalizer<TelegramBotController> _localizer;
     private readonly ILogger<TelegramBotController> _logger;
-    private readonly IUserRegistry _userRegistry;
-    private IOptions<AvailableLanguagesConfiguration> _availableLanguagesConfiguration;
-        
+    private readonly IMediator _mediator;
+    
     public TelegramBotController(ITelegramBotWrapper telegramBot,
         IUserRegistry userRegistry,
         ILogger<TelegramBotController> logger,
-        IOptions<AvailableLanguagesConfiguration> availableLanguagesConfiguration,
-        IStringLocalizer<TelegramBotController> localizer)
+        IStringLocalizer<TelegramBotController> localizer, 
+        IMediator mediator)
     {
         _tg = telegramBot;
-        _userRegistry = userRegistry;
-        _availableLanguagesConfiguration = availableLanguagesConfiguration;
         _logger = logger;
         _localizer = localizer;
+        _mediator = mediator;
     }
 
     private void HandlerMenuDefault(MenuItem menu, UserProfile user)
@@ -33,40 +33,10 @@ public class TelegramBotController : ITelegramBotController
         _logger.LogInformation($"User: {user.Id}, Menu: {menu.Name}"); 
         _tg.SendMenu(user, $"User: {user.Id}, Menu: {menu.Name}", menu);
     }
-
-    async Task HandleChangeLanguage(InlineMenuItem menuItem, UserProfile user)
-    {
-        var newLang = menuItem.Key;
-        if (user.Lang != menuItem.Key && newLang != null)
-        {
-            await _userRegistry.ChangeLang(user.Id, newLang);
-            throw new NeedReloadLanguageException(newLang);
-        }
-        else
-        {
-            _tg.SetupMainMenu(InitMainMenu());
-            await _tg.DrawMainMenu(user);
-        }
-    }
-
+    
     private void HandlerMenuLanguage(MenuItem menu, UserProfile user)
     {
-        _logger.LogInformation($"User: {user.Id}, Language");
-        var inlineMenu = new InlineMenu();
-        foreach (var lng in _availableLanguagesConfiguration.Value.Languages!)
-        {
-            if (CultureInfo.CurrentCulture.Name == lng.LanguageCode)
-                continue;
-            
-            inlineMenu.Items.Add(new InlineMenuItem()
-            {
-                ItemName = lng.LanguageName,
-                Key = lng.LanguageCode,
-                Callback = HandleChangeLanguage
-            });
-        }
-        
-        _tg.SendInlineMenu(user, $"Select language", inlineMenu);
+        _mediator.Send(new GetOrderProduct.Query(user));
     }
 
     private void HandlerMenuHelp(MenuItem menu, UserProfile user)

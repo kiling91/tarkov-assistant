@@ -1,5 +1,7 @@
+using System.Reflection;
 using Serilog;
 using CommonLib;
+using MediatR;
 using Tarkov.Assistant.Telegram.Bot.Feature;
 using Telegram.Bot.Wrapper;
 using Telegram.Bot.Wrapper.TelegramBot;
@@ -24,8 +26,8 @@ services.AddSingleton<IUserRegistry, UserRegistry>();
 // business-logic service
 services.AddScoped<ITelegramBotController, TelegramBotController>();
 
-
-
+var assembly = Assembly.GetExecutingAssembly();
+services.AddMediatR(assembly);
 
 var app = builder.Build();
 
