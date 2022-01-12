@@ -3,6 +3,7 @@ using Serilog;
 using CommonLib;
 using MediatR;
 using Tarkov.Assistant.Telegram.Bot.Feature;
+using Tarkov.Assistant.Telegram.Bot.TarkovMarket;
 using Telegram.Bot.Wrapper;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
@@ -25,6 +26,7 @@ services.AddSingleton<IUserStateManager, UserStateManager>();
 services.AddSingleton<IUserRegistry, UserRegistry>();
 // business-logic service
 services.AddScoped<ITelegramBotController, TelegramBotController>();
+services.AddSingleton<ITarkovMarket, TarkovMarket>();
 
 var assembly = Assembly.GetExecutingAssembly();
 services.AddMediatR(assembly);
@@ -43,4 +45,6 @@ app.UseRouting();
 app.UseCors();
 app.InitTelegramBotEndPoint(builder.Configuration);
 
+var tarkovMarket = app.Services.GetRequiredService<ITarkovMarket>();
+tarkovMarket.LodItems();
 app.Run();
