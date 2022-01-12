@@ -75,13 +75,15 @@ public class ChangeLanguage
         public async Task<Unit> Handle(Query request, CancellationToken ct)
         {
             _logger.LogInformation($"User: {request.User.Id}, Language");
-            var inlineMenu = new InlineMenu(SelectLanguageHandler.Key);
+            var inlineMenu = new InlineMenu(SelectLanguageHandler.Key)
+            {
+                ItemsPerRow = 3
+            };
             
             foreach (var lng in _languages.Value.Languages!)
             {
                 if (CultureInfo.CurrentCulture.Name == lng.LanguageCode)
                     continue;
-
                 inlineMenu.Items.Add(new InlineMenuItem(lng.LanguageName)
                 {
                     Data = lng.LanguageCode,
