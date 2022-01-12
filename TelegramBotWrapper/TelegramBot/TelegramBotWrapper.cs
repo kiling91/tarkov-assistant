@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Wrapper.UserRegistry;
@@ -11,17 +13,14 @@ public class TelegramBotWrapper : ITelegramBotWrapper
     private readonly ILogger<TelegramBotWrapper> _logger;
     private readonly IUserStateManager _userState;
     private readonly ITelegramBotClient _botClient;
-    private readonly ICallbackStorage _callbackStorage;
 
     public TelegramBotWrapper(
         ITelegramBotClient botClient,
         IUserStateManager userState,
-        ICallbackStorage callbackStorage,
         ILogger<TelegramBotWrapper> logger)
     {
         _botClient = botClient;
         _userState = userState;
-        _callbackStorage = callbackStorage;
         _logger = logger;
     }
 
@@ -70,7 +69,7 @@ public class TelegramBotWrapper : ITelegramBotWrapper
 
         if (currentMenu.HandlerCallback != null)
         {
-            currentMenu.HandlerCallback(currentMenu, user);
+            await currentMenu.HandlerCallback(currentMenu, user);
         }
 
         return true;
@@ -120,18 +119,19 @@ public class TelegramBotWrapper : ITelegramBotWrapper
         return res;
     }
 
-    private InlineKeyboardMarkup RenderInlineMenu(InlineMenu menu)
+    private async Task<InlineKeyboardMarkup> RenderInlineMenu(long userId, InlineMenu menu)
     {
         var row = new List<InlineKeyboardButton>();
+        await _userState.RemoveInlineMenuData(userId, menu.Key);
+        
         foreach (var item in menu.Items)
         {
             var uid = Guid.NewGuid().ToString("N");
+            await _userState.SetInlineMenuData(userId, menu.Key, uid, item.Data);
             row.Add(new InlineKeyboardButton(item.ItemName)
             {
                 CallbackData = uid
             });
-            if (item.Callback != null)
-                _callbackStorage.AddCallBack(uid, item, item.Callback);
         }
 
         InlineKeyboardMarkup res = row.ToArray();
@@ -153,7 +153,7 @@ public class TelegramBotWrapper : ITelegramBotWrapper
     {
         await _botClient.SendChatActionAsync(user.Id, ChatAction.Typing);
 
-        InlineKeyboardMarkup inlineKeyboard = RenderInlineMenu(inlineMenu);
+        var inlineKeyboard = await RenderInlineMenu(user.Id, inlineMenu);
 
         await _botClient.SendTextMessageAsync(chatId: user.Id,
             text: text,

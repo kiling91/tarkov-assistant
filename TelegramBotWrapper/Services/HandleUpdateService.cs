@@ -11,24 +11,25 @@ public class HandleUpdateService : IHandleUpdateService
 {
     private readonly ITelegramBotWrapper _botWrapper;
     private readonly IUserRegistry _userRegistry;
+    private readonly IUserStateManager _userState;
     private readonly ILogger<HandleUpdateService> _logger;
-    private readonly ICallbackStorage _callbackStorage;
+    private readonly ITelegramBotController _controller;
     
     public HandleUpdateService(IUserRegistry userRegistry,
+        IUserStateManager userState,
         ITelegramBotWrapper botWrapper,
         ITelegramBotController controller,
-        ICallbackStorage callbackStorage,
-        ILogger<HandleUpdateService> logger )
+        ILogger<HandleUpdateService> logger)
     {
         _botWrapper = botWrapper;
         _botWrapper.SetupMainMenu(controller.InitMainMenu());
-        
+        _controller = controller;
         _userRegistry = userRegistry;
-        _callbackStorage = callbackStorage;
         _logger = logger;
+        _userState = userState;
     }
 
-    public async Task HandleAsync(Update update)
+    public async Task HandleAsync(Update update, CancellationToken ct)
     {
         var handler = update.Type switch
         {
@@ -38,9 +39,9 @@ public class HandleUpdateService : IHandleUpdateService
             // UpdateType.ShippingQuery:
             // UpdateType.PreCheckoutQuery:
             // UpdateType.Poll:
-            UpdateType.Message => BotOnMessageReceived(update.Message!),
+            UpdateType.Message => BotOnMessageReceived(update.Message!, ct),
             //UpdateType.EditedMessage      => BotOnMessageReceived(update.EditedMessage!),
-            UpdateType.CallbackQuery => BotOnCallbackQueryReceived(update.CallbackQuery!),
+            UpdateType.CallbackQuery => BotOnCallbackQueryReceived(update.CallbackQuery!, ct),
             //UpdateType.InlineQuery        => BotOnInlineQueryReceived(update.InlineQuery!),
             //UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(update.ChosenInlineResult!),
             _ => throw new ArgumentOutOfRangeException()
@@ -56,18 +57,33 @@ public class HandleUpdateService : IHandleUpdateService
         }
     }
 
-    private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery)
+    private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken ct)
     {
         await Task.CompletedTask;
         if (callbackQuery.Data != null)
         {
             var userId = callbackQuery.From?.Id ?? -1;
-            if (await _callbackStorage.Invoke(callbackQuery.Data, userId) == false)
-                _logger.LogWarning($"Not found callback for user {userId}");
+            var user = await _userRegistry.FindUser(userId);
+            if (user == null)
+            {
+                _logger.LogError("User is not found");
+                return;
+            }
+            if (callbackQuery.Data == null)
+            {
+                _logger.LogError("Call back data not found");
+                return;
+            }
+            
+            var data = await _userState.GetInlineMenuData(userId, callbackQuery.Data);
+            if (!data.Exist)
+                return;
+            
+            await _controller.OnInlineMenuCallBack(data.Key!, user, data.Data);
         }
     }
 
-    private async Task BotOnMessageReceived(Message message)
+    private async Task BotOnMessageReceived(Message message, CancellationToken ct)
     {
         if (message.Type != MessageType.Text)
             return;

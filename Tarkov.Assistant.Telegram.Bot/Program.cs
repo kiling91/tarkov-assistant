@@ -37,6 +37,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<UserLanguageMiddleware>();
+    
 app.InitLocalization(builder.Configuration);
 app.UseRouting();
 app.UseCors();

@@ -4,5 +4,5 @@ namespace Telegram.Bot.Wrapper.Services;
 
 public interface IHandleUpdateService
 {
-    Task HandleAsync(Update update);
+    Task HandleAsync(Update update, CancellationToken ct);
 }

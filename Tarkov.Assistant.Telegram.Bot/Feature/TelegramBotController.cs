@@ -17,7 +17,6 @@ public class TelegramBotController : ITelegramBotController
     private readonly IMediator _mediator;
     
     public TelegramBotController(ITelegramBotWrapper telegramBot,
-        IUserRegistry userRegistry,
         ILogger<TelegramBotController> logger,
         IStringLocalizer<TelegramBotController> localizer, 
         IMediator mediator)
@@ -28,27 +27,26 @@ public class TelegramBotController : ITelegramBotController
         _mediator = mediator;
     }
 
-    private void HandlerMenuDefault(MenuItem menu, UserProfile user)
+    private async Task HandlerMenuDefault(MenuItem menu, UserProfile user)
     {
-        _logger.LogInformation($"User: {user.Id}, Menu: {menu.Name}"); 
-        _tg.SendMenu(user, $"User: {user.Id}, Menu: {menu.Name}", menu);
+        await _tg.SendMenu(user, _localizer["Select an action from the menu"], menu);
     }
     
-    private void HandlerMenuLanguage(MenuItem menu, UserProfile user)
+    private async Task HandlerMenuLanguage(MenuItem menu, UserProfile user)
     {
-        _mediator.Send(new GetOrderProduct.Query(user));
+        await _mediator.Send(new ChangeLanguage.Query(user));
     }
 
-    private void HandlerMenuHelp(MenuItem menu, UserProfile user)
+    private async Task HandlerMenuHelp(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Help");
-        _tg.SendText(user, $"User: {user.Id}, Help");
+        await _tg.SendText(user, $"User: {user.Id}, Help");
     }
     
-    private void HandlerMenuPersonalAccount(MenuItem menu, UserProfile user)
+    private async Task HandlerMenuPersonalAccount(MenuItem menu, UserProfile user)
     {
         _logger.LogInformation($"User: {user.Id}, Personal account");
-        _tg.SendMenu(user, $"User: {user.Id}, Personal account", menu);
+        await _tg.SendMenu(user, $"User: {user.Id}, Personal account", menu);
     }
 
     public MenuItem InitMainMenu()
@@ -59,6 +57,7 @@ public class TelegramBotController : ITelegramBotController
         };
         
         mainMenu.AddItem(_localizer["Share contact"], HandlerMenuHelp, MenuItemType.IsRequestPhoneButton);
+        
         var personalAccount = mainMenu.AddItem(_localizer["Personal account"], 
             HandlerMenuPersonalAccount, MenuItemType.Text, true);
 
@@ -71,5 +70,13 @@ public class TelegramBotController : ITelegramBotController
         mainMenu.AddItem(_localizer["Help"], HandlerMenuHelp, MenuItemType.Text, true);
         
         return mainMenu;
+    }
+
+    public async Task OnInlineMenuCallBack(string key, UserProfile user, string? data)
+    {
+        if (key == SelectLanguageHandler.Key)
+        {
+            await _mediator.Send(new SelectLanguageHandler.Query(user, data));
+        }
     }
 }

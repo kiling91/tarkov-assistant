@@ -13,9 +13,9 @@ public class WebhookController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] Update update)
+    public async Task<IActionResult> Post([FromBody] Update update, CancellationToken ct)
     {
-        await _handle.HandleAsync(update);
+        await _handle.HandleAsync(update, ct);
         return Ok();
     }
 }
