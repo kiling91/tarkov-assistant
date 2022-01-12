@@ -1,0 +1,10 @@
+{
+  "base_catalog": "../",
+  "languages": ["en", "ru"],
+  "projects": [
+    "Tarkov.Assistant.Telegram.Bot",
+    "TelegramBotWrapper",
+    "CommonLib"
+  ],
+  "translations": "./translations"
+}
