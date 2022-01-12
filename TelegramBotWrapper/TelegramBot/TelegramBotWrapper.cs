@@ -121,11 +121,21 @@ public class TelegramBotWrapper : ITelegramBotWrapper
 
     private async Task<InlineKeyboardMarkup> RenderInlineMenu(long userId, InlineMenu menu)
     {
+        if (menu.RemovePrevInlineMenuData)
+            await _userState.RemoveInlineMenuData(userId, menu.Key);
+        
+        var buttons = new List<List<InlineKeyboardButton>>(); 
         var row = new List<InlineKeyboardButton>();
-        await _userState.RemoveInlineMenuData(userId, menu.Key);
+        buttons.Add(row);
         
         foreach (var item in menu.Items)
         {
+            if (row.Count >= menu.ItemsPerRow)
+            {
+                row = new List<InlineKeyboardButton>();
+                buttons.Add(row);
+            }
+                
             var uid = Guid.NewGuid().ToString("N");
             await _userState.SetInlineMenuData(userId, menu.Key, uid, item.Data);
             row.Add(new InlineKeyboardButton(item.ItemName)
@@ -134,8 +144,7 @@ public class TelegramBotWrapper : ITelegramBotWrapper
             });
         }
 
-        InlineKeyboardMarkup res = row.ToArray();
-        return res;
+        return buttons.ToArray();
     }
 
     public async Task SendText(UserProfile user, string text)
