@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Wrapper.UserRegistry;
 
@@ -167,5 +168,15 @@ public class TelegramBotWrapper : ITelegramBotWrapper
         await _botClient.SendTextMessageAsync(chatId: user.Id,
             text: text,
             replyMarkup: inlineKeyboard);
+    }
+
+    public async Task SendPhoto(UserProfile user, string filePath, string text)
+    {
+        await _botClient.SendChatActionAsync(user.Id, ChatAction.UploadPhoto);
+        await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var fileName = filePath.Split(Path.DirectorySeparatorChar).Last();
+        await _botClient.SendPhotoAsync(chatId: user.Id,
+            photo: new InputOnlineFile(fileStream, fileName),
+            caption: text);
     }
 }

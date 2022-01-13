@@ -101,7 +101,8 @@ public class HandleUpdateService : IHandleUpdateService
 
         if (!await _botWrapper.DrawMenu(message.Text, user))
         {
-            // TODO - если не нашли меню, то обрабатываем пользовательский ввод
+            if (message.Text != null)
+                await _controller.OnMessage(user, message.Text);
             await _botWrapper.DrawMainMenu(user);
         }
     }

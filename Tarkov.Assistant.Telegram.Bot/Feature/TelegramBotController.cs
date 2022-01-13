@@ -1,9 +1,9 @@
 using System.Globalization;
 using MediatR;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 using Tarkov.Assistant.Telegram.Bot.Command;
-using Telegram.Bot.Wrapper;
+using Tarkov.Assistant.Telegram.Bot.TarkovMarket;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
 
@@ -15,16 +15,17 @@ public class TelegramBotController : ITelegramBotController
     private readonly IStringLocalizer<TelegramBotController> _localizer;
     private readonly ILogger<TelegramBotController> _logger;
     private readonly IMediator _mediator;
-    
+    private readonly ITarkovMarket _tarkovMarket;
     public TelegramBotController(ITelegramBotWrapper telegramBot,
         ILogger<TelegramBotController> logger,
         IStringLocalizer<TelegramBotController> localizer, 
-        IMediator mediator)
+        IMediator mediator, ITarkovMarket tarkovMarket)
     {
         _tg = telegramBot;
         _logger = logger;
         _localizer = localizer;
         _mediator = mediator;
+        _tarkovMarket = tarkovMarket;
     }
 
     private async Task HandlerMenuDefault(MenuItem menu, UserProfile user)
@@ -77,6 +78,20 @@ public class TelegramBotController : ITelegramBotController
         if (key == SelectLanguageHandler.Key)
         {
             await _mediator.Send(new SelectLanguageHandler.Query(user, data));
+        }
+    }
+
+    public async Task OnMessage(UserProfile user, string message)
+    {
+        var ln = CultureInfo.CurrentCulture.Name;
+        if (message.Length < 3)
+            return;
+        var baseFolder = @"C:\Users\kiling\projects\tarkov-assistant\tarkov-market-parser";
+        
+        var items = _tarkovMarket.SearchByName(message, ln);
+        foreach (var item in items)
+        {
+            await _tg.SendPhoto(user, Path.Join(baseFolder, item.Icon), item.Translation?[ln].Name!);
         }
     }
 }
