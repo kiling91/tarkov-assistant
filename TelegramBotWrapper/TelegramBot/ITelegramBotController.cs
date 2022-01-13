@@ -5,6 +5,6 @@ namespace Telegram.Bot.Wrapper.TelegramBot;
 public interface ITelegramBotController
 {
     MenuItem InitMainMenu();
-    Task OnInlineMenuCallBack(string key, UserProfile user, string? data);
-    Task OnMessage(UserProfile user, string message);
+    Task<bool> OnInlineMenuCallBack(UserProfile user, string key, string? data);
+    Task<bool> OnUserInputCallBack(UserProfile user, string message);
 }

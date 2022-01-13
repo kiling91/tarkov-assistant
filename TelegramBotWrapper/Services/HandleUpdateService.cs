@@ -14,7 +14,7 @@ public class HandleUpdateService : IHandleUpdateService
     private readonly IUserStateManager _userState;
     private readonly ILogger<HandleUpdateService> _logger;
     private readonly ITelegramBotController _controller;
-    
+
     public HandleUpdateService(IUserRegistry userRegistry,
         IUserStateManager userState,
         ITelegramBotWrapper botWrapper,
@@ -69,17 +69,18 @@ public class HandleUpdateService : IHandleUpdateService
                 _logger.LogError("User is not found");
                 return;
             }
+
             if (callbackQuery.Data == null)
             {
                 _logger.LogError("Call back data not found");
                 return;
             }
-            
+
             var data = await _userState.GetInlineMenuData(userId, callbackQuery.Data);
             if (!data.Exist)
                 return;
-            
-            await _controller.OnInlineMenuCallBack(data.Key!, user, data.Data);
+
+            await _controller.OnInlineMenuCallBack(user, data.Key!, data.Data);
         }
     }
 
@@ -102,7 +103,8 @@ public class HandleUpdateService : IHandleUpdateService
         if (!await _botWrapper.DrawMenu(message.Text, user))
         {
             if (message.Text != null)
-                await _controller.OnMessage(user, message.Text);
+                if (await _controller.OnUserInputCallBack(user, message.Text))
+                    return;
             await _botWrapper.DrawMainMenu(user);
         }
     }
@@ -111,7 +113,7 @@ public class HandleUpdateService : IHandleUpdateService
     {
         if (exception is NeedReloadLanguageException dfd)
             throw new NeedReloadLanguageException(dfd.Lang);
-        
+
         var errorMessage = exception switch
         {
             ApiRequestException apiRequestException =>

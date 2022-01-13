@@ -1,6 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -40,9 +38,8 @@ public class TelegramBotWrapper : ITelegramBotWrapper
             return false;
 
         // Получаем актуальное меню, в котором сейчас находимся
-        var actualMenuName = _userState.GetActualMenuName(user.Id);
-        MenuItem? currentMenu = null;
-        currentMenu = actualMenuName == "" ? _mainMenu : _mainMenu.FindMenu(actualMenuName);
+        var actualMenuName = await _userState.GetActualMenuName(user.Id);
+        var currentMenu = actualMenuName == "" ? _mainMenu : _mainMenu.FindMenu(actualMenuName);
 
         if (currentMenu == null)
         {
@@ -66,7 +63,7 @@ public class TelegramBotWrapper : ITelegramBotWrapper
             return false;
         }
 
-        _userState.SetActualMenuName(user.Id, currentMenu.Name);
+        await _userState.SetActualMenuName(user.Id, currentMenu.Name);
 
         if (currentMenu.HandlerCallback != null)
         {
@@ -102,10 +99,9 @@ public class TelegramBotWrapper : ITelegramBotWrapper
 
         foreach (var child in showMenuItem.Children)
         {
-            if (child.Type == MenuItemType.IsRequestPhoneButton)
-                row.Add(KeyboardButton.WithRequestContact(child.Name));
-            else
-                row.Add(new KeyboardButton(child.Name));
+            row.Add(child.Type == MenuItemType.IsRequestPhoneButton
+                ? KeyboardButton.WithRequestContact(child.Name)
+                : new KeyboardButton(child.Name));
             if (!child.LastInRow) continue;
             row = new List<KeyboardButton>();
             buttons.Add(row);

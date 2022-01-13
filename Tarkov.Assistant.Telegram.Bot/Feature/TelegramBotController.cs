@@ -73,19 +73,22 @@ public class TelegramBotController : ITelegramBotController
         return mainMenu;
     }
 
-    public async Task OnInlineMenuCallBack(string key, UserProfile user, string? data)
+    public async Task<bool> OnInlineMenuCallBack(UserProfile user, string key, string? data)
     {
         if (key == SelectLanguageHandler.Key)
         {
             await _mediator.Send(new SelectLanguageHandler.Query(user, data));
+            return true;
         }
+        return false;
     }
 
-    public async Task OnMessage(UserProfile user, string message)
+    public async Task<bool> OnUserInputCallBack(UserProfile user, string message)
     {
+        await Task.CompletedTask;
         var ln = CultureInfo.CurrentCulture.Name;
         if (message.Length < 3)
-            return;
+            return false;
         var baseFolder = @"C:\Users\kiling\projects\tarkov-assistant\tarkov-market-parser";
         
         var items = _tarkovMarket.SearchByName(message, ln);
@@ -93,5 +96,7 @@ public class TelegramBotController : ITelegramBotController
         {
             await _tg.SendPhoto(user, Path.Join(baseFolder, item.Icon), item.Translation?[ln].Name!);
         }
+        
+        return true;
     }
 }
