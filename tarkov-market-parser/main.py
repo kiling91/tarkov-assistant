@@ -10,7 +10,7 @@ ALL_ITEMS_FILE = "all.json"
 TARKOV_ITEMS = "tarkov_items.json"
 ICONS_DIR = "./icons"
 TRANSLATION_DIR = "./translation"
-NAMETOUID_DIR = "./nametouid"
+NAME_TO_UID_DIR = "./name_to_uid"
 
 LANGUAGES = ["en", "ru", "de", "fr", "es", "cn", "cz", "hu", "tr"]
 
@@ -126,11 +126,11 @@ def cashing_icons(all_items):
     print(f"Сaching icons")
     for item in tqdm(all_items):
         try:
-            if download_icon(item["icon"]):
+            if download_icon(item["imgBig"]):
                 request_sleep()
         except Exception:
             name = item["name"]
-            icon = item["icon"]
+            icon = item["imgBig"]
             print(f"\nError get icon {name} - {icon}\n")
 
 def cashing_name_to_uid(all_items, ln):
@@ -149,9 +149,9 @@ def cashing_name_to_uid(all_items, ln):
         name_to_uid[tr_name] = uid
         name_to_uid[tr_shortName] = uid
 
-    if not os.path.exists(NAMETOUID_DIR):
-        os.makedirs(NAMETOUID_DIR)
-    with open(f"{NAMETOUID_DIR}/{ln}.json", 'w', encoding='utf-8') as f:
+    if not os.path.exists(NAME_TO_UID_DIR):
+        os.makedirs(NAME_TO_UID_DIR)
+    with open(f"{NAME_TO_UID_DIR}/{ln}.json", 'w', encoding='utf-8') as f:
         json.dump(name_to_uid, f, ensure_ascii=False, indent=4)
 
 all_items = get_all_items()
@@ -188,7 +188,7 @@ for item in all_items:
     pitem['slots'] = item['slots'] 
     pitem['diff24h'] = item['diff24h'] 
     pitem['diff7days'] = item['diff7days'] 
-    pitem['icon'] = os.path.normpath(img_url_to_filename(item['icon']))
+    pitem['icon'] = os.path.normpath(img_url_to_filename(item['imgBig']))
     
     translation = {}
     for ln in LANGUAGES:
