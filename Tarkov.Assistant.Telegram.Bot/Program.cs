@@ -2,8 +2,12 @@ using System.Reflection;
 using Serilog;
 using CommonLib;
 using MediatR;
+using Microsoft.Extensions.Options;
+using Tarkov.Assistant.Telegram.Bot;
 using Tarkov.Assistant.Telegram.Bot.Feature;
-using Tarkov.Assistant.Telegram.Bot.TarkovMarket;
+using TarkovMarket;
+using TarkovMarket.Command;
+using TarkovMarket.Feature.TarkovMarket;
 using Telegram.Bot.Wrapper;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
@@ -13,9 +17,6 @@ builder.Host.UseSerilog((_, lc) => lc.InitLogger());
 
 // Add services to the container.
 var services = builder.Services;
-var botConfig = builder.Configuration.GetSection(BotConfiguration.ConfigName).Get<BotConfiguration>();
-services.Configure<BotConfiguration>(builder.Configuration.GetSection(BotConfiguration.ConfigName));
-services.Configure<AvailableLanguagesConfiguration>(builder.Configuration.GetSection(AvailableLanguagesConfiguration.ConfigName));
 
 services.InitTelegramBot(builder.Configuration);
 // Локализация хранится в ресурсах
@@ -26,10 +27,15 @@ services.AddSingleton<IUserStateManager, UserStateManager>();
 services.AddSingleton<IUserRegistry, UserRegistry>();
 // business-logic service
 services.AddScoped<ITelegramBotController, TelegramBotController>();
-services.AddSingleton<ITarkovMarket, TarkovMarket>();
+services.AddSingleton<ITarkovMarket, TarkovMarket.Feature.TarkovMarket.TarkovMarket>();
+
+services.Configure<TarkovAssistantConfiguration>(builder.Configuration.GetSection(TarkovAssistantConfiguration.ConfigName));
+services.Configure<TarkovMarketConfiguration>(builder.Configuration.GetSection(TarkovMarketConfiguration.ConfigName));
 
 var assembly = Assembly.GetExecutingAssembly();
 services.AddMediatR(assembly);
+services.AddMediatR(typeof(SearchTarkovItem).GetTypeInfo().Assembly);
+
 
 var app = builder.Build();
 
@@ -46,5 +52,7 @@ app.UseCors();
 app.InitTelegramBotEndPoint(builder.Configuration);
 
 var tarkovMarket = app.Services.GetRequiredService<ITarkovMarket>();
-tarkovMarket.LodItems();
+
+var conf = app.Services.GetRequiredService<IOptions<TarkovMarketConfiguration>>();
+tarkovMarket.LodItems(conf.Value.TarkovMarketDataBaseFolder);
 app.Run();

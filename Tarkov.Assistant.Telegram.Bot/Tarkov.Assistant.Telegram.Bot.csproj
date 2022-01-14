@@ -16,7 +16,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CommonLib\CommonLib.csproj" />
+      <ProjectReference Include="..\TarkovMarket\TarkovMarket.csproj" />
       <ProjectReference Include="..\TelegramBotWrapper\TelegramBotWrapper.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="TarkovMarket" />
     </ItemGroup>
 
 </Project>

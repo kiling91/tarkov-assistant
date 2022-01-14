@@ -10,5 +10,5 @@ public interface ITelegramBotWrapper
     Task SendText(UserProfile user, string text);
     Task SendMenu(UserProfile user, string text, MenuItem menu);
     Task SendInlineMenu(UserProfile user, string text, InlineMenu inlineMenu);
-    Task SendPhoto(UserProfile user, string filePath, string text);
+    Task SendPhoto(UserProfile user, string filePath, string text, InlineMenu? inlineMenu = null);
 }

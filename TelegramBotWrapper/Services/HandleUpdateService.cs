@@ -44,7 +44,7 @@ public class HandleUpdateService : IHandleUpdateService
             UpdateType.CallbackQuery => BotOnCallbackQueryReceived(update.CallbackQuery!, ct),
             //UpdateType.InlineQuery        => BotOnInlineQueryReceived(update.InlineQuery!),
             //UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(update.ChosenInlineResult!),
-            _ => throw new ArgumentOutOfRangeException()
+            _ => OnDefaultCallBack(update.Type)
         };
 
         try
@@ -55,6 +55,12 @@ public class HandleUpdateService : IHandleUpdateService
         {
             await HandleErrorAsync(exception);
         }
+    }
+
+    private async Task OnDefaultCallBack(UpdateType type)
+    {
+        _logger.LogWarning($"Not found UpdateType: {type}");
+        await Task.CompletedTask;
     }
 
     private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken ct)
@@ -100,12 +106,17 @@ public class HandleUpdateService : IHandleUpdateService
             from.FirstName, from.LastName,
             from.LanguageCode);
 
+        if (message.Text == "/start")
+        {
+            await _botWrapper.DrawMainMenu(user);
+            return;
+        }
+        
         if (!await _botWrapper.DrawMenu(message.Text, user))
         {
             if (message.Text != null)
                 if (await _controller.OnUserInputCallBack(user, message.Text))
                     return;
-            await _botWrapper.DrawMainMenu(user);
         }
     }
 

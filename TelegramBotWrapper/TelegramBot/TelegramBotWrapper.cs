@@ -120,11 +120,11 @@ public class TelegramBotWrapper : ITelegramBotWrapper
     {
         if (menu.RemovePrevInlineMenuData)
             await _userState.RemoveInlineMenuData(userId, menu.Key);
-        
-        var buttons = new List<List<InlineKeyboardButton>>(); 
+
+        var buttons = new List<List<InlineKeyboardButton>>();
         var row = new List<InlineKeyboardButton>();
         buttons.Add(row);
-        
+
         foreach (var item in menu.Items)
         {
             if (row.Count >= menu.ItemsPerRow)
@@ -132,7 +132,7 @@ public class TelegramBotWrapper : ITelegramBotWrapper
                 row = new List<InlineKeyboardButton>();
                 buttons.Add(row);
             }
-                
+
             var uid = Guid.NewGuid().ToString("N");
             await _userState.SetInlineMenuData(userId, menu.Key, uid, item.Data);
             row.Add(new InlineKeyboardButton(item.ItemName)
@@ -166,13 +166,16 @@ public class TelegramBotWrapper : ITelegramBotWrapper
             replyMarkup: inlineKeyboard);
     }
 
-    public async Task SendPhoto(UserProfile user, string filePath, string text)
+    public async Task SendPhoto(UserProfile user, string filePath, string text, InlineMenu? inlineMenu = null)
     {
+        var inlineKeyboard = inlineMenu != null ? await RenderInlineMenu(user.Id, inlineMenu) : null;
+        
         await _botClient.SendChatActionAsync(user.Id, ChatAction.UploadPhoto);
         await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         var fileName = filePath.Split(Path.DirectorySeparatorChar).Last();
         await _botClient.SendPhotoAsync(chatId: user.Id,
             photo: new InputOnlineFile(fileStream, fileName),
-            caption: text);
+            caption: text, ParseMode.Html,
+            replyMarkup: inlineKeyboard);
     }
 }

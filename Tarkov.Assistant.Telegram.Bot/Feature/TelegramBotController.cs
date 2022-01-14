@@ -1,9 +1,7 @@
-using System.Globalization;
 using MediatR;
 using Microsoft.Extensions.Localization;
 using Tarkov.Assistant.Telegram.Bot.Command;
-using Tarkov.Assistant.Telegram.Bot.TarkovMarket;
-using Telegram.Bot.Types.InputFiles;
+using TarkovMarket.Command;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
 
@@ -15,17 +13,15 @@ public class TelegramBotController : ITelegramBotController
     private readonly IStringLocalizer<TelegramBotController> _localizer;
     private readonly ILogger<TelegramBotController> _logger;
     private readonly IMediator _mediator;
-    private readonly ITarkovMarket _tarkovMarket;
     public TelegramBotController(ITelegramBotWrapper telegramBot,
         ILogger<TelegramBotController> logger,
         IStringLocalizer<TelegramBotController> localizer, 
-        IMediator mediator, ITarkovMarket tarkovMarket)
+        IMediator mediator)
     {
         _tg = telegramBot;
         _logger = logger;
         _localizer = localizer;
         _mediator = mediator;
-        _tarkovMarket = tarkovMarket;
     }
 
     private async Task HandlerMenuDefault(MenuItem menu, UserProfile user)
@@ -80,23 +76,20 @@ public class TelegramBotController : ITelegramBotController
             await _mediator.Send(new SelectLanguageHandler.Query(user, data));
             return true;
         }
+        
+        if (key == ShowTarkovHandler.Key)
+        {
+            await _mediator.Send(new ShowTarkovHandler.Query(user, data));
+            return true;
+        }
+        
         return false;
     }
 
     public async Task<bool> OnUserInputCallBack(UserProfile user, string message)
     {
-        await Task.CompletedTask;
-        var ln = CultureInfo.CurrentCulture.Name;
-        if (message.Length < 3)
-            return false;
-        var baseFolder = @"C:\Users\kiling\projects\tarkov-assistant\tarkov-market-parser";
-        
-        var items = _tarkovMarket.SearchByName(message, ln);
-        foreach (var item in items)
-        {
-            await _tg.SendPhoto(user, Path.Join(baseFolder, item.Icon), item.Translation?[ln].Name!);
-        }
-        
+        // if (InputState == SearchTarkovItem.InputState)
+        await _mediator.Send(new SearchTarkovItem.Query(user, message));
         return true;
     }
 }

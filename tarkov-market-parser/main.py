@@ -8,7 +8,8 @@ from urllib.parse import urlparse
 
 ALL_ITEMS_FILE = "all.json"
 TARKOV_ITEMS = "tarkov_items.json"
-ICONS_DIR = "./icons"
+ICONS_DIR_SM = "./icons_sm"
+ICONS_DIR_LG = "./icons_lg"
 TRANSLATION_DIR = "./translation"
 NAME_TO_UID_DIR = "./name_to_uid"
 
@@ -56,17 +57,17 @@ def request_item(uid, lang):
     response = requests.request("POST", url, headers=headers, data=payload)
     return json.loads(response.text)
 
-def img_url_to_filename(img_url):
+def img_url_to_filename(img_url, img_dir):
     a = urlparse(img_url)
     file_name = os.path.basename(a.path)
     file_name = format_filename(file_name)
-    return os.path.join(ICONS_DIR, file_name)
+    return os.path.join(img_dir, file_name)
 
-def download_icon(img_url):
-    if not os.path.exists(ICONS_DIR):
-        os.makedirs(ICONS_DIR)
+def download_icon(img_url, img_dir):
+    if not os.path.exists(img_dir):
+        os.makedirs(img_dir)
 
-    file_name = img_url_to_filename(img_url)
+    file_name = img_url_to_filename(img_url, img_dir)
     if os.path.exists(file_name):
         return False
 
@@ -126,12 +127,13 @@ def cashing_icons(all_items):
     print(f"Сaching icons")
     for item in tqdm(all_items):
         try:
-            if download_icon(item["imgBig"]):
+            if download_icon(item["icon"], ICONS_DIR_SM):
+                request_sleep()
+            if download_icon(item["imgBig"], ICONS_DIR_LG):
                 request_sleep()
         except Exception:
             name = item["name"]
-            icon = item["imgBig"]
-            print(f"\nError get icon {name} - {icon}\n")
+            print(f"\nError get icon {name}\n")
 
 def cashing_name_to_uid(all_items, ln):
     translation = {}
@@ -188,8 +190,9 @@ for item in all_items:
     pitem['slots'] = item['slots'] 
     pitem['diff24h'] = item['diff24h'] 
     pitem['diff7days'] = item['diff7days'] 
-    pitem['icon'] = os.path.normpath(img_url_to_filename(item['imgBig']))
-    
+    pitem['iconSm'] = os.path.normpath(img_url_to_filename(item['icon'], ICONS_DIR_SM))
+    pitem['iconLg'] = os.path.normpath(img_url_to_filename(item['imgBig'], ICONS_DIR_LG))
+
     translation = {}
     for ln in LANGUAGES:
         translation[ln] = {
@@ -198,6 +201,14 @@ for item in all_items:
         }
     pitem["translation"] = translation
     prepare_items.append(pitem)
+
+# Get main tags
+main_tags = {}
+for item in all_items:
+    for tag in item['tags']:
+        if not tag in main_tags:
+            main_tags[tag] = True
+            print(tag)
 
 with open(TARKOV_ITEMS, 'w', encoding='utf-8') as f:
     json.dump(prepare_items, f, ensure_ascii=False, indent=4)
