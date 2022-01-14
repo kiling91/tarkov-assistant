@@ -1,64 +1,69 @@
-Ammo;
-Magazines;
-Tactical devices;
-Weapon parts;
-Barter;
-Sights;
-Special scopes;
-Provisions;
-Drinks;
-Containers;
-Keys;
-Keycards;
-Weapon;
-Melee weapons;
-Interchange;
-Shoreline;
-Factory;
-Reserve;
-Customs;
-Lighthouse;
-Gear;
-Face protection;
-Meds;
-Food;
-Assault scopes;
-Optics;
-Compact reflex sights;
-Collimators;
-Backpacks;
-Headwear;
-Helmets;
-Facecovers;
-Chest rigs;
-Headsets;
-Armor vests;
-Assault rifles;
-Assault carbines;
-Bolt action rifles;
-Light machine guns;
-Designated marksman rifles;
-Pistols;
-Shotguns;
-Submachine guns;
-Hand grenade;
-Handguards;
-Mounts;
-Barrels;
-Iron sights;
-Secure containers;
-Armband;
-Currency;
-Grenade launchers;
-Special equipment;
-Bipods;
-Maps;
-Stocks & chassis;
-Pistol grips;
-Muzzle adapters;
-No results found for your search;
+Ammo;Боеприпасы
+Magazines;Магазины
+Tactical devices;Тактические комбинированные устройства
+Weapon parts;Оружейные части
+Barter;Предметы для бартера
+Sights;Прицелы
+Special scopes;Специальное оборудование
+Provisions;Провизия
+Drinks;Напитки
+Containers;Контейнеры
+Keys;Ключи
+Keycards;Ключ-карты
+Weapon;Оружие
+Melee weapons;Холодное оружие
+Interchange;Развязка
+Shoreline;Берег
+Factory;Завод
+Reserve;Резерв
+Customs;Таможня
+Woods;Лес
+Lighthouse;Маяк
+Gear;Снаряжение
+Face protection;Защита лица
+Meds;Медецина
+Food;Еда
+Assault scopes;Штурмовые прицелы
+Suppressors;Глушители
+Optics;Оптические прицелы
+Compact reflex sights;Компактные коллиматоры
+Collimators;Коллиматоры
+Backpacks;Рюкзаки
+Headwear;Головные уборы
+Helmets;Шлемы
+Facecovers;Маски для лица
+Chest rigs;Разгрузки
+Headsets;Наушники
+Armor vests;Бронежелеты
+Assault rifles;Штурмовые винтовки
+Assault carbines;Штурмовые карабины
+Bolt action rifles;Болтовые винтовки
+Light machine guns;Ручные пулеметы
+Designated marksman rifles;Марксманские винтовки
+Pistols;Пистолеты
+Shotguns;Дробовики
+Submachine guns;Пистолеты-пулеметы
+Hand grenade;Ручные гранаты
+Handguards;Цевья
+Mounts;Крепления
+Barrels;Стволы
+Iron sights;Целики
+Secure containers;Защищенные контейнеры
+Armband;Повязки на руку
+Currency;Валюта
+Grenade launchers;Гранатометы
+Special equipment;Спецоборудование
+Bipods;Сошки
+Maps;Карты
+Stocks & chassis;Stocks & chassis
+Pistol grips;Пистолетные рукояти
+Muzzle adapters;Дульные адаптеры
+No results found for your search;По вашему запросу ничего не найдено
+Found the following items for '{0}':;Найдены следующие предметы для
+{0} {1} items;{0} {1} предметов;
+Show more...;Показать еще...
+Showing {0} of {1} items;Показано {0} из {1} предметов;
+Minimum number of characters to search 3 characters;Минимальное количество символов для поиска - 3 символа
 Found the following offers for '{0}':;
 {0} {1} items;
-Show more...;
 Showing {0} of {1} items;
-Minimum number of characters to search 3 characters;

@@ -56,13 +56,14 @@ public class SearchTarkovAction
             if (tag == "Factory") return _localizer["Factory"];
             if (tag == "Reserve") return _localizer["Reserve"];
             if (tag == "Customs") return _localizer["Customs"];
+            if (tag == "Woods") return _localizer["Woods"];
             if (tag == "Lighthouse") return _localizer["Lighthouse"];
             if (tag == "Gear") return _localizer["Gear"];
             if (tag == "Face_shields") return _localizer["Face protection"];
             if (tag == "Meds") return _localizer["Meds"];
             if (tag == "Food") return _localizer["Food"];
             if (tag == "Assault_scopes") return _localizer["Assault scopes"];
-            if (tag == "Suppressors") return _localizer["Face protection"];
+            if (tag == "Suppressors") return _localizer["Suppressors"];
             if (tag == "Optics") return _localizer["Optics"];
             if (tag == "Compact_Collimators") return _localizer["Compact reflex sights"];
             if (tag == "Collimators") return _localizer["Collimators"];
