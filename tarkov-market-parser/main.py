@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 ALL_ITEMS_FILE = "all.json"
 TARKOV_ITEMS = "tarkov_items.json"
+TARKOV_MAIN_TAGS = "tarkov_main_tags.json"
 ICONS_DIR_SM = "./icons_sm"
 ICONS_DIR_LG = "./icons_lg"
 TRANSLATION_DIR = "./translation"
@@ -202,13 +203,16 @@ for item in all_items:
     pitem["translation"] = translation
     prepare_items.append(pitem)
 
-# Get main tags
-main_tags = {}
-for item in all_items:
-    for tag in item['tags']:
-        if not tag in main_tags:
-            main_tags[tag] = True
-            print(tag)
-
 with open(TARKOV_ITEMS, 'w', encoding='utf-8') as f:
     json.dump(prepare_items, f, ensure_ascii=False, indent=4)
+
+    
+# Get main tags
+main_tags = []
+for item in all_items:
+    for tag in item['tags']:
+        main_tags.append(tag)
+        break
+main_tags = list(set(main_tags))
+with open(TARKOV_MAIN_TAGS, 'w', encoding='utf-8') as f:
+    json.dump(main_tags, f, ensure_ascii=False, indent=4)

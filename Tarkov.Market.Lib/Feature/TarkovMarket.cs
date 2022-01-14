@@ -9,9 +9,12 @@ public class TarkovMarket : ITarkovMarket
 {
     private const string TarkovItems = "tarkov_items.json";
     private const string NameToUidDir = "name_to_uid";
+    private const string MainTags = "tarkov_main_tags.json";
+    
     private readonly List<TarkovItem> _items = new();
     private readonly Dictionary<string, Dictionary<string, string>> _translations = new();
     private readonly IOptions<AvailableLanguagesConfiguration> _languages;
+    private List<string>? _mainTags = new List<string>();
 
     public TarkovMarket(IOptions<AvailableLanguagesConfiguration> languages)
     {
@@ -35,9 +38,11 @@ public class TarkovMarket : ITarkovMarket
                 if (translation != null)
                     _translations.Add(ln.LanguageCode, translation);
             }
+        var dataTags = File.ReadAllText(Path.Join(baseFolder, MainTags));
+        _mainTags = JsonConvert.DeserializeObject<List<string>>(dataTags);
     }
 
-    public (int, IEnumerable<TarkovItem>) SearchByName(string query, int skip, int take, string? tag)
+    public SearchByName SearchByName(string query, int skip, int take, string? tag)
     {
         var uidList = new HashSet<string>();
 
@@ -72,7 +77,25 @@ public class TarkovMarket : ITarkovMarket
         
         if (tag != null)
             result = result.Where(x => x.Tags != null && x.Tags.Contains(tag)).ToList();
+
+        if (_mainTags == null)
+            throw new ArgumentNullException(nameof(_mainTags));
+
+        var set = new HashSet<string>();
+        foreach (var item in result)
+        {
+            foreach (var itag in item.Tags!)
+            {
+                if (_mainTags.Contains(itag))
+                    set.Add(itag);
+            }
+        }
         
-        return (result.Count, result.Skip(skip).Take(take));
+        return new SearchByName()
+        {
+            AllCount = result.Count,
+            Items = result.Skip(skip).Take(take),
+            MainTagsCount = set.Count,
+        };
     }
 }

@@ -11,9 +11,11 @@ namespace Tarkov.Market.Lib.Command;
 
 public class SearchTarkovAction
 {
-    public const int TakeDefault = 3;
+    private const int TakeDefault = 3;
+    private const int ItemsPerRow = 1;
     
     public const string InputState = "SearchTarkovItem";
+
     public record Query(UserProfile User, ShowTarkovSearchData Data) : IRequest<Unit>;
 
     public class Handler : IRequestHandler<Query, Unit>
@@ -23,7 +25,7 @@ public class SearchTarkovAction
         private readonly IOptions<TarkovMarketConfiguration> _config;
         private readonly IStringLocalizer<SearchTarkovAction> _localizer;
         private readonly string _lang = CultureInfo.CurrentCulture.Name;
-        
+
         public Handler(ITelegramBotWrapper tg,
             ITarkovMarket tarkovMarket,
             IOptions<TarkovMarketConfiguration> config,
@@ -98,10 +100,10 @@ public class SearchTarkovAction
             if (tag == "Stocks_chassis") return _localizer["Stocks & chassis"];
             if (tag == "Pistol_grips") return _localizer["Pistol grips"];
             if (tag == "Muzzle_adapters") return _localizer["Muzzle adapters"];
-            
+
             throw new ArgumentOutOfRangeException(nameof(tag));
         }
-        
+
         private string RenderText(TarkovItem item)
         {
             var text = "";
@@ -113,8 +115,8 @@ public class SearchTarkovAction
         private Dictionary<string, int> GetTags(int count, string message, string? tag)
         {
             var tags = new Dictionary<string, int>();
-            var (_, allItems) = _tarkovMarket.SearchByName(message, 0, count, tag);
-            foreach (var item in allItems)
+            var search = _tarkovMarket.SearchByName(message, 0, count, tag);
+            foreach (var item in search.Items)
             {
                 foreach (var itag in item.Tags!)
                 {
@@ -123,39 +125,44 @@ public class SearchTarkovAction
                     tags[itag]++;
                 }
             }
+
             return tags.OrderByDescending(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
         }
-        
+
         public async Task<Unit> Handle(Query request, CancellationToken ct)
         {
             var user = request.User;
             var data = request.Data;
 
-            var (allCount, items) = 
+            var search =
                 _tarkovMarket.SearchByName(data.Message!, data.Skip, TakeDefault, data.Tag);
 
-            if (allCount <= 0)
+            if (search.AllCount <= 0)
             {
                 await _tg.SendText(user, _localizer["No results found for your search"]);
                 return Unit.Value;
             }
 
-            var tags = GetTags(allCount, data.Message!, data.Tag);
+            var tags = GetTags(search.AllCount, data.Message!, data.Tag);
             var skip = data.Skip + TakeDefault;
-            
-            await _tg.SendText(user, _localizer["Found the following items"]);
-            foreach (var item in items)
+
+            var showItems = search.AllCount <= TakeDefault || search.MainTagsCount <= 1;
+            if (showItems)
             {
-                var icon = Path.Join(_config.Value.TarkovMarketDataBaseFolder, item.IconLg);
-                await _tg.SendPhoto(user, icon, RenderText(item));
+                await _tg.SendText(user, _localizer["Found the following items"]);
+                foreach (var item in search.Items)
+                {
+                    var icon = Path.Join(_config.Value.TarkovMarketDataBaseFolder, item.IconLg);
+                    await _tg.SendPhoto(user, icon, RenderText(item));
+                }
             }
-            
+
             var inlineMenu = new InlineMenu(ShowTarkovHandler.Key)
             {
-                ItemsPerRow = 2,
+                ItemsPerRow = ItemsPerRow,
             };
-            
+
             // Show tags
             if (tags.Count > 1)
                 foreach (var tag in tags)
@@ -166,27 +173,33 @@ public class SearchTarkovAction
                         Tag = tag.Key,
                         Skip = 0,
                     };
-                    inlineMenu.Items.Add(new InlineMenuItem(_localizer["{0} {1} items", TranslateTag(tag.Key), tag.Value])
-                    {
-                        Data = JsonConvert.SerializeObject(inputTagData),
-                    });
+                    inlineMenu.Items.Add(
+                        new InlineMenuItem(_localizer["{0} {1} items", TranslateTag(tag.Key), tag.Value])
+                        {
+                            Data = JsonConvert.SerializeObject(inputTagData),
+                        });
                 }
-            
-            if (allCount <= skip) return Unit.Value;
-            
-            // Show more...
-            var inputData = new ShowTarkovSearchData()
-            {
-                Message = data.Message,
-                Skip = data.Skip + TakeDefault,
-                Tag = data.Tag
-            };
-            inlineMenu.Items.Add(new InlineMenuItem(_localizer["Show more..."])
-            {
-                Data = JsonConvert.SerializeObject(inputData),
-            });
 
-            var showItemsText = _localizer["Showing {0} of {1} items", skip, allCount];
+            if (search.AllCount <= skip) return Unit.Value;
+
+            // Show more...
+            if (showItems)
+            {
+                var inputData = new ShowTarkovSearchData()
+                {
+                    Message = data.Message,
+                    Skip = data.Skip + TakeDefault,
+                    Tag = data.Tag
+                };
+                inlineMenu.Items.Add(new InlineMenuItem(_localizer["Show more..."])
+                {
+                    Data = JsonConvert.SerializeObject(inputData),
+                });
+            }
+
+            var showItemsText = _localizer["Showing {0} of {1} items", skip, search.AllCount];
+            if (!showItems)
+                showItemsText = _localizer["Refine your request"];
             await _tg.SendInlineMenu(request.User, showItemsText, inlineMenu);
             return Unit.Value;
         }
