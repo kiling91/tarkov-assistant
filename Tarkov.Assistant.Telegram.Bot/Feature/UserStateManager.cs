@@ -5,20 +5,22 @@ namespace Tarkov.Assistant.Telegram.Bot.Feature;
 public class UserStateManager : IUserStateManager
 {
     private string _menuName = "";
-
+    
     private readonly Dictionary<string, string> _dataStorage = new();
     private readonly Dictionary<string, bool> _uidExists = new();
     private readonly Dictionary<string, string> _keyByUid = new();
 
     private readonly Dictionary<string, List<string>> _uidsByKey = new();
 
-    public void SetActualMenuName(long userId, string menuName)
+    public async Task SetActualMenuName(long userId, string menuName)
     {
+        await Task.CompletedTask;
         _menuName = menuName;
     }
 
-    public string GetActualMenuName(long userId)
+    public async Task<string> GetActualMenuName(long userId)
     {
+        await Task.CompletedTask;
         return _menuName;
     }
 

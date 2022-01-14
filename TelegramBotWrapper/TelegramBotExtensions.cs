@@ -11,7 +11,9 @@ public static class TelegramBotExtensions
     public static void InitTelegramBot(this IServiceCollection services, IConfiguration configuration)
     {
         var botConfig = configuration.GetSection(BotConfiguration.ConfigName).Get<BotConfiguration>();
-
+        services.Configure<BotConfiguration>(configuration.GetSection(BotConfiguration.ConfigName));
+        services.Configure<AvailableLanguagesConfiguration>(configuration.GetSection(AvailableLanguagesConfiguration.ConfigName));
+        
         // There are several strategies for completing asynchronous tasks during startup.
         // Some of them could be found in this article https://andrewlock.net/running-async-tasks-on-app-startup-in-asp-net-core-part-1/
         // We are going to use IHostedService to add and later remove Webhook

@@ -1,10 +1,6 @@
 {
   "base_catalog": "../",
   "languages": ["en", "ru"],
-  "projects": [
-    "Tarkov.Assistant.Telegram.Bot",
-    "TelegramBotWrapper",
-    "CommonLib"
-  ],
+  "projects": ["Tarkov.Assistant.Telegram.Bot", "Tarkov.Market.Lib"],
   "translations": "./translations"
 }

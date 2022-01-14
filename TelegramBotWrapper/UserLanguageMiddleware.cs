@@ -24,7 +24,7 @@ namespace Telegram.Bot.Wrapper
     {
         private readonly RequestDelegate _next;
         private readonly IUserRegistry _userRegistry;
-        private ILogger<UserLanguageMiddleware> _logger;
+        private readonly ILogger<UserLanguageMiddleware> _logger;
         public UserLanguageMiddleware(RequestDelegate next,
             IUserRegistry userRegistry, ILogger<UserLanguageMiddleware> logger)
         {

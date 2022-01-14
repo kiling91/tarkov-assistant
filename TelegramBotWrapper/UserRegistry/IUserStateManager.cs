@@ -9,11 +9,9 @@ public struct InlineMenuData
 
 public interface IUserStateManager
 {
-    void SetActualMenuName(long userId, string menuName);
-    string GetActualMenuName(long userId);
-
+    Task SetActualMenuName(long userId, string menuName);
+    Task<string> GetActualMenuName(long userId);
     Task SetInlineMenuData(long userId, string key, string uid, string? data);
     Task<InlineMenuData> GetInlineMenuData(long userId, string uid);
-
     Task RemoveInlineMenuData(long userId, string key);
 }

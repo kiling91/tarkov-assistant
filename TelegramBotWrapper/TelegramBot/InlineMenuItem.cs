@@ -9,8 +9,10 @@ public class InlineMenuItem
 		ItemName = itemName;
 	}
 
-	public string ItemName { get; init; }
+	public string ItemName { get; private init; }
 	public string? Data { get; init; }
+	
+	public string? Url { get; init; }
 }
 
 public class InlineMenu

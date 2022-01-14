@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Wrapper.UserRegistry;
 
@@ -39,9 +38,8 @@ public class TelegramBotWrapper : ITelegramBotWrapper
             return false;
 
         // Получаем актуальное меню, в котором сейчас находимся
-        var actualMenuName = _userState.GetActualMenuName(user.Id);
-        MenuItem? currentMenu = null;
-        currentMenu = actualMenuName == "" ? _mainMenu : _mainMenu.FindMenu(actualMenuName);
+        var actualMenuName = await _userState.GetActualMenuName(user.Id);
+        var currentMenu = actualMenuName == "" ? _mainMenu : _mainMenu.FindMenu(actualMenuName);
 
         if (currentMenu == null)
         {
@@ -65,7 +63,7 @@ public class TelegramBotWrapper : ITelegramBotWrapper
             return false;
         }
 
-        _userState.SetActualMenuName(user.Id, currentMenu.Name);
+        await _userState.SetActualMenuName(user.Id, currentMenu.Name);
 
         if (currentMenu.HandlerCallback != null)
         {
@@ -101,10 +99,9 @@ public class TelegramBotWrapper : ITelegramBotWrapper
 
         foreach (var child in showMenuItem.Children)
         {
-            if (child.Type == MenuItemType.IsRequestPhoneButton)
-                row.Add(KeyboardButton.WithRequestContact(child.Name));
-            else
-                row.Add(new KeyboardButton(child.Name));
+            row.Add(child.Type == MenuItemType.IsRequestPhoneButton
+                ? KeyboardButton.WithRequestContact(child.Name)
+                : new KeyboardButton(child.Name));
             if (!child.LastInRow) continue;
             row = new List<KeyboardButton>();
             buttons.Add(row);
@@ -123,11 +120,11 @@ public class TelegramBotWrapper : ITelegramBotWrapper
     {
         if (menu.RemovePrevInlineMenuData)
             await _userState.RemoveInlineMenuData(userId, menu.Key);
-        
-        var buttons = new List<List<InlineKeyboardButton>>(); 
+
+        var buttons = new List<List<InlineKeyboardButton>>();
         var row = new List<InlineKeyboardButton>();
         buttons.Add(row);
-        
+
         foreach (var item in menu.Items)
         {
             if (row.Count >= menu.ItemsPerRow)
@@ -135,11 +132,13 @@ public class TelegramBotWrapper : ITelegramBotWrapper
                 row = new List<InlineKeyboardButton>();
                 buttons.Add(row);
             }
-                
+
             var uid = Guid.NewGuid().ToString("N");
             await _userState.SetInlineMenuData(userId, menu.Key, uid, item.Data);
+            
             row.Add(new InlineKeyboardButton(item.ItemName)
             {
+                Url = item.Url,
                 CallbackData = uid
             });
         }
@@ -166,6 +165,19 @@ public class TelegramBotWrapper : ITelegramBotWrapper
 
         await _botClient.SendTextMessageAsync(chatId: user.Id,
             text: text,
+            replyMarkup: inlineKeyboard);
+    }
+
+    public async Task SendPhoto(UserProfile user, string filePath, string text, InlineMenu? inlineMenu = null)
+    {
+        var inlineKeyboard = inlineMenu != null ? await RenderInlineMenu(user.Id, inlineMenu) : null;
+        
+        await _botClient.SendChatActionAsync(user.Id, ChatAction.UploadPhoto);
+        await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var fileName = filePath.Split(Path.DirectorySeparatorChar).Last();
+        await _botClient.SendPhotoAsync(chatId: user.Id,
+            photo: new InputOnlineFile(fileStream, fileName),
+            caption: text, ParseMode.Html,
             replyMarkup: inlineKeyboard);
     }
 }
