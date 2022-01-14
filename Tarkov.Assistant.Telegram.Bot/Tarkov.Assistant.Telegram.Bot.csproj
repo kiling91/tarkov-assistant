@@ -20,8 +20,4 @@
       <ProjectReference Include="..\TelegramBotWrapper\TelegramBotWrapper.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="TarkovMarket" />
-    </ItemGroup>
-
 </Project>

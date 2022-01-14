@@ -28,6 +28,7 @@ services.AddSingleton<IUserRegistry, UserRegistry>();
 // business-logic service
 services.AddScoped<ITelegramBotController, TelegramBotController>();
 services.AddSingleton<ITarkovMarket, TarkovMarket>();
+services.AddSingleton<IInputStateManager, InputStateManager>();
 
 services.Configure<TarkovAssistantConfiguration>(builder.Configuration.GetSection(TarkovAssistantConfiguration.ConfigName));
 services.Configure<TarkovMarketConfiguration>(builder.Configuration.GetSection(TarkovMarketConfiguration.ConfigName));

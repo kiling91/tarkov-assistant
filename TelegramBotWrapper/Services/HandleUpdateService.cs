@@ -81,7 +81,7 @@ public class HandleUpdateService : IHandleUpdateService
                 _logger.LogError("Call back data not found");
                 return;
             }
-
+            await _controller.OnBeforeCallBack(user);
             var data = await _userState.GetInlineMenuData(userId, callbackQuery.Data);
             if (!data.Exist)
                 return;
@@ -105,7 +105,7 @@ public class HandleUpdateService : IHandleUpdateService
         var user = await _userRegistry.FindOrCreateUser(from.Id,
             from.FirstName, from.LastName,
             from.LanguageCode);
-
+        
         if (message.Text == "/start")
         {
             await _botWrapper.DrawMainMenu(user);
@@ -117,6 +117,7 @@ public class HandleUpdateService : IHandleUpdateService
             if (message.Text != null)
                 if (await _controller.OnUserInputCallBack(user, message.Text))
                     return;
+            await _botWrapper.DrawMainMenu(user);
         }
     }
 
