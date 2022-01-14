@@ -135,8 +135,10 @@ public class TelegramBotWrapper : ITelegramBotWrapper
 
             var uid = Guid.NewGuid().ToString("N");
             await _userState.SetInlineMenuData(userId, menu.Key, uid, item.Data);
+            
             row.Add(new InlineKeyboardButton(item.ItemName)
             {
+                Url = item.Url,
                 CallbackData = uid
             });
         }

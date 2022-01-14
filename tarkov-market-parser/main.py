@@ -1,3 +1,4 @@
+from cmath import pi
 import os
 import requests
 import json
@@ -149,8 +150,14 @@ def cashing_name_to_uid(all_items, ln):
         tr_name = translation[orig_name]
         tr_shortName = translation[orig_shortName]
 
-        name_to_uid[tr_name] = uid
-        name_to_uid[tr_shortName] = uid
+        if not tr_name in name_to_uid:
+          name_to_uid[tr_name] = []
+
+        name_to_uid[tr_name].append(uid)
+
+        if not tr_shortName in name_to_uid:
+          name_to_uid[tr_shortName] = []
+        name_to_uid[tr_shortName].append(uid)
 
     if not os.path.exists(NAME_TO_UID_DIR):
         os.makedirs(NAME_TO_UID_DIR)
@@ -193,7 +200,7 @@ for item in all_items:
     pitem['diff7days'] = item['diff7days'] 
     pitem['iconSm'] = os.path.normpath(img_url_to_filename(item['icon'], ICONS_DIR_SM))
     pitem['iconLg'] = os.path.normpath(img_url_to_filename(item['imgBig'], ICONS_DIR_LG))
-
+    pitem['link'] = item['link'] 
     translation = {}
     for ln in LANGUAGES:
         translation[ln] = {

@@ -10,5 +10,5 @@ public struct SearchByName
 public interface ITarkovMarket
 {
     void LodItems(string baseFolder);
-    SearchByName SearchByName(string query, int skip, int take, string? tag);
+    SearchByName SearchByName(string query, string lang, int skip, int take, string? tag);
 }

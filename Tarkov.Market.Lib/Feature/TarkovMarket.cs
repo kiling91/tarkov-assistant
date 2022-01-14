@@ -12,7 +12,7 @@ public class TarkovMarket : ITarkovMarket
     private const string MainTags = "tarkov_main_tags.json";
     
     private readonly List<TarkovItem> _items = new();
-    private readonly Dictionary<string, Dictionary<string, string>> _translations = new();
+    private readonly Dictionary<string, Dictionary<string, List<string>>> _translations = new();
     private readonly IOptions<AvailableLanguagesConfiguration> _languages;
     private List<string>? _mainTags = new List<string>();
 
@@ -34,7 +34,7 @@ public class TarkovMarket : ITarkovMarket
             {
                 var translationData =
                     File.ReadAllText(Path.Join(baseFolder, $"{NameToUidDir}\\{ln.LanguageCode}.json"));
-                var translation = JsonConvert.DeserializeObject<Dictionary<string, string>>(translationData);
+                var translation = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(translationData);
                 if (translation != null)
                     _translations.Add(ln.LanguageCode, translation);
             }
@@ -42,20 +42,34 @@ public class TarkovMarket : ITarkovMarket
         _mainTags = JsonConvert.DeserializeObject<List<string>>(dataTags);
     }
 
-    public SearchByName SearchByName(string query, int skip, int take, string? tag)
+    public SearchByName SearchByName(string query, string lang, int skip, int take, string? tag)
     {
+        if (!_translations.ContainsKey(lang))
+        {
+            //TODO: совй exeption
+            throw new ArgumentNullException();
+        }
+        
         var uidList = new HashSet<string>();
 
-        foreach (var (_, translation) in _translations)
+        var translation = _translations[lang];
+        foreach (var tr in translation)
         {
-            foreach (var tr in translation)
+            var v1 = tr.Key.ToLower().Trim();
+            
+            var queryArray = query.ToLower().Trim().Split(" ");
+            var allContains = true;
+            foreach (var q in queryArray)
             {
-                var v1 = tr.Key.ToLower().Trim();
-                var v2 = query.ToLower().Trim();
-                if (!v1.Contains(v2))
-                    continue;
-                uidList.Add(tr.Value);
+                if (!v1.Contains(q))
+                {
+                    allContains = false;
+                    break;
+                }
             }
+            if (allContains)
+                foreach (var uid in tr.Value)
+                    uidList.Add(uid);
         }
 
         var result = new List<TarkovItem>();

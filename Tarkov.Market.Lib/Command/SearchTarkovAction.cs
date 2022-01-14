@@ -13,7 +13,7 @@ public class SearchTarkovAction
 {
     private const int TakeDefault = 3;
     private const int ItemsPerRow = 1;
-    
+
     public const string InputState = "SearchTarkovItem";
 
     public record Query(UserProfile User, ShowTarkovSearchData Data) : IRequest<Unit>;
@@ -35,6 +35,17 @@ public class SearchTarkovAction
             _config = config;
             _localizer = localizer;
             _tarkovMarket = tarkovMarket;
+        }
+
+        private bool IgnoreRenderTags(string tag)
+        {
+            var items = new string[]
+            {
+                "5.56x45mm_NATO", "9x39mm", "4.6x30mm_HK", "5.45x39mm", "7.62x39mm", "7.62x51mm_NATO", "7.62x54mmR",
+                "9x19mm_Parabellum", "5.7x28mm_FN", "12x70mm", "12.7x55mm_STs-130", "9x21mm_Gyurza", "9x18mm_Makarov",
+                "7.62x25mm_Tokarev", "20x70mm", ".366_TKM", ".45_ACP", "40x46_mm", "30x29mm", "23x75mm"
+            };
+            return Array.IndexOf(items, tag) >= 0;
         }
 
         private string TranslateTag(string tag)
@@ -100,22 +111,49 @@ public class SearchTarkovAction
             if (tag == "Stocks_chassis") return _localizer["Stocks & chassis"];
             if (tag == "Pistol_grips") return _localizer["Pistol grips"];
             if (tag == "Muzzle_adapters") return _localizer["Muzzle adapters"];
-
+            if (tag == "Flashhiders_brakes") return _localizer["Flashhiders brakes"];
+            if (tag == "Receivers_slides") return _localizer["Receivers slides"];
+            if (tag == "Eyewear") return _localizer["Eyewear"];
+            if (tag == "Charging_handles") return _localizer["Charging_handles"];
             throw new ArgumentOutOfRangeException(nameof(tag));
+        }
+
+        private string TranslateTraderName(string traderName)
+        {
+            if (traderName == "Prapor") return _localizer["Prapor"];
+            if (traderName == "Therapist") return _localizer["Therapist"];
+            if (traderName == "Fence") return _localizer["Fence"];
+            if (traderName == "Skier") return _localizer["Skier"];
+            if (traderName == "Peacekeeper") return _localizer["Peacekeeper"];
+            if (traderName == "Mechanic") return _localizer["Mechanic"];
+            if (traderName == "Ragman") return _localizer["Ragman"];
+            if (traderName == "Jaeger") return _localizer["Jaeger"];
+            throw new ArgumentOutOfRangeException(nameof(traderName));
         }
 
         private string RenderText(TarkovItem item)
         {
             var text = "";
-            text += $"Name: {item.Translation?[_lang].ShortName!}\n";
-            text += $"Flea price: {item.BasePrice}₽\n";
+            text += $"<b>{item.Translation?[_lang].Name!}</b>\n";
+            
+            text += _localizer["Average price: {0} ₽", item.Avg24hPrice] + "\n";
+
+            var price = item.Avg24hPrice / (float) item.Slots;
+            var pricePerSlot = (int) Math.Round(price);
+            text += _localizer["Price per slot: {0} ₽", pricePerSlot] + "\n";
+            text += _localizer["Flea price: {0} ₽", item.BasePrice!] + "\n";
+            text += $"{TranslateTraderName(item.TraderName!)}: {item.TraderPrice} {item.TraderPriceCur}\n";
+
+            var caption = _localizer["More details"];
+            text += $"<a href='{item.Link}'>{caption}</a>";
+
             return text;
         }
 
         private Dictionary<string, int> GetTags(int count, string message, string? tag)
         {
             var tags = new Dictionary<string, int>();
-            var search = _tarkovMarket.SearchByName(message, 0, count, tag);
+            var search = _tarkovMarket.SearchByName(message, _lang, 0, count, tag);
             foreach (var item in search.Items)
             {
                 foreach (var itag in item.Tags!)
@@ -136,7 +174,7 @@ public class SearchTarkovAction
             var data = request.Data;
 
             var search =
-                _tarkovMarket.SearchByName(data.Message!, data.Skip, TakeDefault, data.Tag);
+                _tarkovMarket.SearchByName(data.Message!, _lang, data.Skip, TakeDefault, data.Tag);
 
             if (search.AllCount <= 0)
             {
@@ -167,6 +205,8 @@ public class SearchTarkovAction
             if (tags.Count > 1)
                 foreach (var tag in tags)
                 {
+                    if (IgnoreRenderTags(tag.Key))
+                        continue;
                     var inputTagData = new ShowTarkovSearchData()
                     {
                         Message = data.Message,
@@ -174,7 +214,7 @@ public class SearchTarkovAction
                         Skip = 0,
                     };
                     inlineMenu.Items.Add(
-                        new InlineMenuItem(_localizer["{0} {1} items", TranslateTag(tag.Key), tag.Value])
+                        new InlineMenuItem($"{TranslateTag(tag.Key)} ({tag.Value})")
                         {
                             Data = JsonConvert.SerializeObject(inputTagData),
                         });
