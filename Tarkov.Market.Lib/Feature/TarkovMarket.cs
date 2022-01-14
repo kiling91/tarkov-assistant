@@ -37,24 +37,20 @@ public class TarkovMarket : ITarkovMarket
             }
     }
 
-    public (int, IEnumerable<TarkovItem>) SearchByName(string query, string lang, int skip, int take, string? tag)
+    public (int, IEnumerable<TarkovItem>) SearchByName(string query, int skip, int take, string? tag)
     {
-        if (!_translations.ContainsKey(lang))
-        {
-            //TODO: совй exeption
-            throw new ArgumentNullException();
-        }
-
         var uidList = new HashSet<string>();
 
-        var translation = _translations[lang];
-        foreach (var tr in translation)
+        foreach (var (_, translation) in _translations)
         {
-            var v1 = tr.Key.ToLower().Trim();
-            var v2 = query.ToLower().Trim();
-            if (!v1.Contains(v2))
-                continue;
-            uidList.Add(tr.Value);
+            foreach (var tr in translation)
+            {
+                var v1 = tr.Key.ToLower().Trim();
+                var v2 = query.ToLower().Trim();
+                if (!v1.Contains(v2))
+                    continue;
+                uidList.Add(tr.Value);
+            }
         }
 
         var result = new List<TarkovItem>();

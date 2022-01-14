@@ -113,7 +113,7 @@ public class SearchTarkovAction
         private Dictionary<string, int> GetTags(int count, string message, string? tag)
         {
             var tags = new Dictionary<string, int>();
-            var (_, allItems) = _tarkovMarket.SearchByName(message, _lang, 0, count, tag);
+            var (_, allItems) = _tarkovMarket.SearchByName(message, 0, count, tag);
             foreach (var item in allItems)
             {
                 foreach (var itag in item.Tags!)
@@ -133,7 +133,7 @@ public class SearchTarkovAction
             var data = request.Data;
 
             var (allCount, items) = 
-                _tarkovMarket.SearchByName(data.Message!, _lang, data.Skip, TakeDefault, data.Tag);
+                _tarkovMarket.SearchByName(data.Message!, data.Skip, TakeDefault, data.Tag);
 
             if (allCount <= 0)
             {
@@ -144,7 +144,7 @@ public class SearchTarkovAction
             var tags = GetTags(allCount, data.Message!, data.Tag);
             var skip = data.Skip + TakeDefault;
             
-            await _tg.SendText(user, _localizer["Found the following offers for '{0}':", data.Message!]);
+            await _tg.SendText(user, _localizer["Found the following items"]);
             foreach (var item in items)
             {
                 var icon = Path.Join(_config.Value.TarkovMarketDataBaseFolder, item.IconLg);

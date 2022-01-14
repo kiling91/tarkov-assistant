@@ -17,12 +17,14 @@ Shoreline;Shoreline
 Factory;Factory
 Reserve;Reserve
 Customs;Customs
+Woods;Woods
 Lighthouse;Lighthouse
 Gear;Gear
 Face protection;Face protection
 Meds;Meds
 Food;Food
 Assault scopes;Assault scopes
+Suppressors;Suppressors
 Optics;Optics
 Compact reflex sights;Compact reflex sights
 Collimators;Collimators
@@ -61,7 +63,5 @@ Found the following items for '{0}':;Found the following items for '{0}':
 {0} {1} items;{0} {1} items
 Show more...;Show more...
 Showing {0} of {1} items;Showing {0} of {1} items
-Minimum number of characters to search 3 characters;Minimum number of characters to search - 3 characters
-Woods;Woods
-Suppressors;Suppressors
-Found the following offers for '{0}':;Found the following offers for '{0}':
+Minimum number of characters to search 3 characters;Minimum number of characters to search 3 characters
+Found the following items;Found the following items
