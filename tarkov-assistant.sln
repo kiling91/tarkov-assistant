@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLib", "CommonLib\Comm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarkov.Assistant.Telegram.Bot", "Tarkov.Assistant.Telegram.Bot\Tarkov.Assistant.Telegram.Bot.csproj", "{F068097B-FB2B-4F27-8A4C-79251C2A2C74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TarkovMarket", "TarkovMarket\TarkovMarket.csproj", "{4D96BDB0-8FAA-456D-AB24-123487DC3905}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarkov.Market.Lib", "Tarkov.Market.Lib\Tarkov.Market.Lib.csproj", "{4D96BDB0-8FAA-456D-AB24-123487DC3905}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

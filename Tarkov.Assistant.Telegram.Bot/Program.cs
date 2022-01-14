@@ -5,9 +5,9 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using Tarkov.Assistant.Telegram.Bot;
 using Tarkov.Assistant.Telegram.Bot.Feature;
-using TarkovMarket;
-using TarkovMarket.Command;
-using TarkovMarket.Feature.TarkovMarket;
+using Tarkov.Market.Lib;
+using Tarkov.Market.Lib.Command;
+using Tarkov.Market.Lib.Feature;
 using Telegram.Bot.Wrapper;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
@@ -27,7 +27,7 @@ services.AddSingleton<IUserStateManager, UserStateManager>();
 services.AddSingleton<IUserRegistry, UserRegistry>();
 // business-logic service
 services.AddScoped<ITelegramBotController, TelegramBotController>();
-services.AddSingleton<ITarkovMarket, TarkovMarket.Feature.TarkovMarket.TarkovMarket>();
+services.AddSingleton<ITarkovMarket, TarkovMarket>();
 
 services.Configure<TarkovAssistantConfiguration>(builder.Configuration.GetSection(TarkovAssistantConfiguration.ConfigName));
 services.Configure<TarkovMarketConfiguration>(builder.Configuration.GetSection(TarkovMarketConfiguration.ConfigName));

@@ -130,12 +130,14 @@ def load_translation(prefix, languages, translation_folder_csv, localization_tex
         if not find:
             ts = Translation()
             ts.language = ln
-            ts.translation = ""
             localization_text.translations.append(ts)
             
             with open(path, 'a', encoding='utf-8', newline='') as csvfile:
                 writer = csv.writer(csvfile, delimiter=';')
-                writer.writerow([localization_text.content, ""])  
+                if ln == languages[0]:
+                    writer.writerow([localization_text.content, localization_text.content])
+                else:
+                    writer.writerow([localization_text.content, ""])  
 
 def xml(resx, ln, text):
     if not resx.is_file():

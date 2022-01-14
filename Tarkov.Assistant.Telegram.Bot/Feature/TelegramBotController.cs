@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Localization;
 using Tarkov.Assistant.Telegram.Bot.Command;
-using TarkovMarket.Command;
+using Tarkov.Market.Lib.Command;
 using Telegram.Bot.Wrapper.TelegramBot;
 using Telegram.Bot.Wrapper.UserRegistry;
 
