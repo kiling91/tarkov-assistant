@@ -115,7 +115,9 @@ public class SearchTarkovAction
             if (tag == "Receivers_slides") return _localizer["Receivers slides"];
             if (tag == "Eyewear") return _localizer["Eyewear"];
             if (tag == "Charging_handles") return _localizer["Charging_handles"];
-            throw new ArgumentOutOfRangeException(nameof(tag));
+            if (tag == "Helmet_mounts") return _localizer["Helmet mounts"];
+			return "#" + tag;
+            // throw new ArgumentOutOfRangeException(nameof(tag));
         }
 
         private string TranslateTraderName(string traderName)
